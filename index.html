@@ -309,6 +309,7 @@ const REFS={
  miller:{v:'Gropper MA, editor. Miller\'s Anesthesia. 9.ª ed. Filadelfia: Elsevier; 2020.'},
  atls:{v:'American College of Surgeons Committee on Trauma. Advanced Trauma Life Support (ATLS): Student Course Manual. 10.ª ed. Chicago: American College of Surgeons; 2018.'},
  asa:{v:'American Society of Anesthesiologists. ASA Physical Status Classification System [Internet]. Schaumburg (IL): ASA; 2014 [actualizado 13 dic 2020]. Disponible en: asahq.org/resources/clinical-information/asa-physical-status-classification-system',u:'https://www.asahq.org/resources/clinical-information/asa-physical-status-classification-system',ul:'ASA'},
+ netter:{v:'Netter FH. Atlas de anatomía humana. 2.ª ed. Barcelona: Masson; 1999.'},
  couinaud:{v:'Couinaud C. Le foie: études anatomiques et chirurgicales. París: Masson; 1957.'},
  devine:{v:'Devine BJ. Gentamicin therapy. Drug Intell Clin Pharm. 1974;8:650-5.'},
  strasberg:{v:'Strasberg SM, Hertl M, Soper NJ. An analysis of the problem of biliary injury during laparoscopic cholecystectomy. J Am Coll Surg. 1995;180(1):101-25.',p:'8000648'},
@@ -340,20 +341,25 @@ const REFS={
  deerenberg:{v:'Deerenberg EB, Harlaar JJ, Steyerberg EW, Lont HE, van Doorn HC, Heisterkamp J, et al. Small bites versus large bites for closure of abdominal midline incisions (STITCH): a double-blind, multicentre, randomised controlled trial. Lancet. 2015;386(10000):1254-60.',p:'26188742',d:'10.1016/S0140-6736(15)60459-7'},
  martyn:{v:'Martyn JA, Richtsfeld M. Succinylcholine-induced hyperkalemia in acquired pathologic states: etiologic factors and molecular mechanisms. Anesthesiology. 2006;104(1):158-69.',p:'16394702',d:'10.1097/00000542-200601000-00022'}
 };
-/* Reemplaza {{clave,clave}} por [n] numerados por orden de aparición; devuelve [html, lista] */
+/* Reemplaza {{clave,clave@lámina}} por [n] numerados por orden de aparición; devuelve [html, lista].
+   clave@276 cita la lámina o página 276 de esa obra; las láminas citadas se listan junto a la referencia. */
 function cite(html){
-  const order=[];
-  const out=html.replace(/\{\{([\w,]+)\}\}/g,(_,ks)=>{
-    const n=ks.split(',').filter(k=>REFS[k]).map(k=>{let i=order.indexOf(k);if(i<0){order.push(k);i=order.length-1}return i+1});
-    return n.length?`<sup class="cite">[${n.join(',')}]</sup>`:'';
+  const order=[],plates={};
+  const out=html.replace(/\{\{([\w@,]+)\}\}/g,(_,ks)=>{
+    const n=ks.split(',').map(s=>{const [k,p]=s.split('@');if(!REFS[k])return 0;
+      let i=order.indexOf(k);if(i<0){order.push(k);i=order.length-1}
+      if(p)(plates[k]=plates[k]||new Set()).add(+p);return i+1}).filter(Boolean);
+    const u=[...new Set(n)];
+    return u.length?`<sup class="cite">[${u.join(',')}]</sup>`:'';
   });
-  return [out,refList(order)];
+  return [out,refList(order,plates)];
 }
-function refList(keys){
+function refList(keys,plates={}){
   if(!keys.length)return '';
   return `<details class="refs"><summary>Referencias (${keys.length})</summary><ol>${keys.map(k=>{const r=REFS[k];
     const links=[r.d?`<a href="https://doi.org/${r.d}" target="_blank" rel="noopener">doi:${r.d}</a>`:'',r.p?`<a href="https://pubmed.ncbi.nlm.nih.gov/${r.p}/" target="_blank" rel="noopener">PMID: ${r.p}</a>`:'',r.u?`<a href="${r.u}" target="_blank" rel="noopener">${r.ul}</a>`:''].filter(Boolean).join(' · ');
-    return `<li>${r.v}${links?' '+links:''}</li>`}).join('')}</ol></details>`;
+    const lam=plates[k]?` ${plates[k].size>1?'Láminas':'Lámina'} ${[...plates[k]].sort((a,b)=>a-b).join(', ')}.`:'';
+    return `<li>${r.v}${lam}${links?' '+links:''}</li>`}).join('')}</ol></details>`;
 }
 const withRefs=h=>cite(h).join('');
 
@@ -422,44 +428,44 @@ const SVG_CALOT=`<svg viewBox="0 0 330 200" role="img" aria-label="Triángulo he
 <path d="M200 40 L115 85 L200 130" style="fill:var(--alert);fill-opacity:.06;stroke:var(--ink)" stroke-dasharray="5 4" stroke-width="1.5"/>
 <text x="212" y="160" class="svgt">Colédoco</text><text x="212" y="62" class="svgt">Hepático común</text><text x="122" y="118" class="svgt" transform="rotate(25 122 118)">Cístico</text><text x="215" y="98" class="svgt" style="fill:var(--alert)">Arteria cística</text><text x="22" y="190" class="svgt">Vesícula</text></svg>`;
 const ANAT=[
-{t:'Triángulo hepatocístico (de Calot) y vía biliar',tag:'Colecistectomía',svg:SVG_CALOT,cap:'Esquema: el triángulo se limita por el conducto cístico, el hepático común y el borde inferior del hígado.{{strasberg,moore}}',html:`
-<ul class="tight"><li><b>Contenido:</b> arteria cística (rama de la hepática derecha), ganglio de Lund, tejido linfograso.{{moore,sabiston}}</li>
-<li><b>Variantes frecuentes:</b> arteria hepática derecha aberrante o reemplazada desde la mesentérica superior, que discurre posterior al conducto cístico; arteria cística doble; conductos hepáticos derechos accesorios que desembocan en el cístico.{{moore,sabiston}}</li>
+{t:'Triángulo hepatocístico (de Calot) y vía biliar',tag:'Colecistectomía',svg:SVG_CALOT,cap:'Esquema: el triángulo se limita por el conducto cístico, el hepático común y el borde inferior del hígado.{{strasberg,moore,netter@276}}',html:`
+<ul class="tight"><li><b>Contenido:</b> arteria cística (rama de la hepática derecha), ganglio de Lund, tejido linfograso.{{moore,sabiston,netter@276}}</li>
+<li><b>Variantes frecuentes:</b> arteria hepática derecha aberrante o reemplazada desde la mesentérica superior, que discurre posterior al conducto cístico; arteria cística doble; conductos hepáticos derechos accesorios que desembocan en el cístico.{{moore,sabiston,netter@277,netter@288}}</li>
 <li><b>Referencias de seguridad:</b> surco de Rouvière (la disección se mantiene por encima de él){{sabiston}} y visión crítica de seguridad.{{strasberg}}</li>
 <li><b>Lesión típica:</b> confundir el colédoco con el cístico (clasificación de Strasberg para lesiones de la vía biliar).{{strasberg}}</li></ul>
 <div class="risk"><b>Visión crítica de seguridad:</b> triángulo despejado de grasa y fibrosis, el tercio inferior de la vesícula separado del lecho hepático, y exactamente dos estructuras que entran en la vesícula.{{strasberg}} Si no se logra, convertir o hacer colecistectomía subtotal.{{sabiston}}</div>`},
 {t:'Canal inguinal y triángulos de riesgo',tag:'Hernia inguinal',html:`
-<div class="meta"><div><span>Longitud</span>4–6 cm, oblicuo, sobre el ligamento inguinal</div><div><span>Contenido</span>Cordón espermático o ligamento redondo, nervio ilioinguinal, rama genital del genitofemoral{{moore}}</div></div>
-<ul class="tight"><li><b>Pared anterior:</b> aponeurosis del oblicuo externo (más oblicuo interno lateralmente). <b>Posterior:</b> fascia transversalis y tendón conjunto. <b>Techo:</b> oblicuo interno y transverso. <b>Piso:</b> ligamento inguinal y lacunar.{{moore,sabiston}}</li>
-<li><b>Hernia indirecta:</b> sale por el anillo profundo, <u>lateral</u> a los vasos epigástricos inferiores. <b>Directa:</b> a través del triángulo de Hesselbach, <u>medial</u> a esos vasos (límites: vasos epigástricos, borde lateral del recto, ligamento inguinal).{{moore,herniasurge}}</li>
+<div class="meta"><div><span>Longitud</span>4–6 cm, oblicuo, sobre el ligamento inguinal</div><div><span>Contenido</span>Cordón espermático o ligamento redondo, nervio ilioinguinal, rama genital del genitofemoral{{moore,netter@245}}</div></div>
+<ul class="tight"><li><b>Pared anterior:</b> aponeurosis del oblicuo externo (más oblicuo interno lateralmente). <b>Posterior:</b> fascia transversalis y tendón conjunto. <b>Techo:</b> oblicuo interno y transverso. <b>Piso:</b> ligamento inguinal y lacunar.{{moore,sabiston,netter@243}}</li>
+<li><b>Hernia indirecta:</b> sale por el anillo profundo, <u>lateral</u> a los vasos epigástricos inferiores. <b>Directa:</b> a través del triángulo de Hesselbach, <u>medial</u> a esos vasos (límites: vasos epigástricos, borde lateral del recto, ligamento inguinal).{{moore,herniasurge,netter@243}}</li>
 <li><b>Triángulo del desastre:</b> entre el conducto deferente y los vasos testiculares; contiene vasos ilíacos externos. No debe fijarse ni engraparse.{{sabiston}}</li>
 <li><b>Triángulo del dolor:</b> lateral a los vasos testiculares, bajo el tracto iliopúbico; contiene nervio femorocutáneo lateral y rama femoral del genitofemoral. No debe engraparse.{{sabiston,herniasurge}}</li></ul>`},
 {t:'Tiroides, nervio laríngeo recurrente y paratiroides',tag:'Tiroidectomía',html:`
-<ul class="tight"><li><b>Irrigación:</b> arteria tiroidea superior (carótida externa) e inferior (tronco tirocervical). Ocasional arteria tiroidea ima.{{moore}}</li>
-<li><b>Nervio laríngeo recurrente:</b> asciende en el surco traqueoesofágico. Se encuentra en el triángulo de Beahrs (carótida, tráquea y arteria tiroidea inferior). Cerca del ligamento de Berry puede ser tironeado. Variante: nervio no recurrente derecho (&lt;1%).{{moore,sabiston}}</li>
-<li><b>Rama externa del laríngeo superior:</b> inerva el cricotiroideo; se lesiona al ligar el polo superior lejos de la glándula (pérdida de tono agudo).{{moore,sabiston}}</li>
-<li><b>Paratiroides:</b> habitualmente 4; las inferiores se irrigan de la tiroidea inferior. Ligar las ramas sobre la cápsula tiroidea y autotrasplantar glándulas desvascularizadas.{{sabiston}}</li></ul>
+<ul class="tight"><li><b>Irrigación:</b> arteria tiroidea superior (carótida externa) e inferior (tronco tirocervical). Ocasional arteria tiroidea ima.{{moore,netter@68,netter@69}}</li>
+<li><b>Nervio laríngeo recurrente:</b> asciende en el surco traqueoesofágico; el izquierdo rodea el arco aórtico y el derecho, la arteria subclavia derecha.{{netter@69}} Se encuentra en el triángulo de Beahrs (carótida, tráquea y arteria tiroidea inferior). Cerca del ligamento de Berry puede ser tironeado. Variante: nervio no recurrente derecho (&lt;1%).{{moore,sabiston}}</li>
+<li><b>Rama externa del laríngeo superior:</b> inerva el cricotiroideo; se lesiona al ligar el polo superior lejos de la glándula (pérdida de tono agudo).{{moore,sabiston,netter@69}}</li>
+<li><b>Paratiroides:</b> habitualmente 4; las inferiores se irrigan de la tiroidea inferior. Ligar las ramas sobre la cápsula tiroidea y autotrasplantar glándulas desvascularizadas.{{sabiston,netter@70}}</li></ul>
 <div class="risk"><b>Hematoma cervical postoperatorio:</b> urgencia vital. Abrir la herida en cabecera si hay compromiso respiratorio.{{sabiston}}</div>`},
-{t:'Segmentación hepática de Couinaud',tag:'Resecciones hepáticas',svg:SVG_COUINAUD,cap:'Vista anterior: segmentos I (caudado, no visible) a VIII.{{couinaud}}',html:`
-<ul class="tight"><li>El hígado se divide en 8 segmentos funcionales, cada uno con pedículo portal (rama portal, arterial y biliar) y drenaje venoso propios.{{couinaud,moore}}</li>
+{t:'Segmentación hepática de Couinaud',tag:'Resecciones hepáticas',svg:SVG_COUINAUD,cap:'Vista anterior: segmentos I (caudado, no visible) a VIII.{{couinaud,netter@272}}',html:`
+<ul class="tight"><li>El hígado se divide en 8 segmentos funcionales, cada uno con pedículo portal (rama portal, arterial y biliar) y drenaje venoso propios.{{couinaud,moore,netter@272}}</li>
 <li><b>Plano principal (de Cantlie):</b> vena hepática media, desde la fosa vesicular hasta la vena cava; separa el hígado derecho del izquierdo.{{moore,sabiston}}</li>
-<li><b>Venas hepáticas</b> (derecha, media, izquierda) corren entre segmentos; el pedículo portal corre en su centro.{{moore}}</li>
+<li><b>Venas hepáticas</b> (derecha, media, izquierda) corren entre segmentos; el pedículo portal corre en su centro.{{moore,netter@273}}</li>
 <li>El segmento I (caudado) drena directamente a la vena cava.{{moore,sabiston}}</li>
 <li>Para resecar con seguridad se requiere un remanente con ≥ 25–30 % del volumen hepático en hígado sano (más en cirrosis o quimioterapia).{{sabiston}}</li></ul>`},
 {t:'Irrigación del colon y puntos críticos',tag:'Colectomías',html:`
-<div class="tbl"><table><caption>Fuente: {{moore,sabiston}}</caption><tr><th>Arteria</th><th>Nivel</th><th>Territorio</th></tr>
+<div class="tbl"><table><caption>Fuente: {{moore,sabiston,netter@282,netter@286,netter@287}}</caption><tr><th>Arteria</th><th>Nivel</th><th>Territorio</th></tr>
 <tr><td>Tronco celíaco</td><td class="num">T12</td><td>Intestino anterior (estómago, hígado, bazo, páncreas)</td></tr>
 <tr><td>Mesentérica superior</td><td class="num">L1</td><td>Duodeno distal a yeyuno-íleon, colon derecho y transverso proximal</td></tr>
 <tr><td>Mesentérica inferior</td><td class="num">L3</td><td>Colon izquierdo (desde ⅔ distales del transverso) y recto alto</td></tr></table></div>
-<ul class="tight"><li><b>Arco marginal de Drummond</b> y <b>arcada de Riolano</b> conectan ambos territorios.{{moore}}</li>
+<ul class="tight"><li><b>Arco marginal de Drummond</b> y <b>arcada de Riolano</b> conectan ambos territorios.{{moore,netter@287}}</li>
 <li><b>Puntos críticos de isquemia (watershed):</b> punto de Griffiths (ángulo esplénico) y de Sudeck (unión rectosigmoidea).{{moore,sabiston}}</li>
 <li>En la ligadura alta de la arteria mesentérica inferior, proteger el plexo hipogástrico superior y el uréter izquierdo.{{sabiston}}</li></ul>`},
 {t:'Capas de la pared abdominal e incisiones',tag:'Acceso',html:`
-<ul class="tight"><li><b>De superficial a profundo:</b> piel, fascia de Camper, fascia de Scarpa, músculos (oblicuo externo, interno, transverso; recto del abdomen con su vaina), fascia transversalis, grasa preperitoneal, peritoneo.{{moore}}</li>
-<li><b>Línea arcuata:</b> bajo ella, la vaina posterior del recto desaparece y las tres aponeurosis pasan por delante del músculo.{{moore}}</li>
+<ul class="tight"><li><b>De superficial a profundo:</b> piel, fascia de Camper, fascia de Scarpa, músculos (oblicuo externo, interno, transverso; recto del abdomen con su vaina), fascia transversalis, grasa preperitoneal, peritoneo.{{moore,netter@232,netter@233,netter@234}}</li>
+<li><b>Línea arcuata:</b> bajo ella, la vaina posterior del recto desaparece y las tres aponeurosis pasan por delante del músculo.{{moore,netter@235}}</li>
 <li><b>Línea alba:</b> avascular, ideal para laparotomía media. En incisiones de Pfannenstiel se respeta el recto.{{moore,sabiston}}</li>
 <li><b>McBurney:</b> incisión oblicua que divide las fibras musculares (sin cortarlas). <b>Kocher</b> subcostal derecha para vesícula.{{sabiston}}</li>
-<li><b>Puertos laparoscópicos:</b> los vasos epigástricos inferiores se visualizan por transiluminación o laparoscopía antes de colocar trocares laterales.{{sabiston}}</li></ul>`}
+<li><b>Puertos laparoscópicos:</b> los vasos epigástricos inferiores se visualizan por transiluminación o laparoscopía antes de colocar trocares laterales.{{sabiston,netter@238}}</li></ul>`}
 ];
 $('#anatList').innerHTML=ANAT.map((a,i)=>`<details ${i===0?'open':''}><summary><span>${a.t}</span><span class="pill">${a.tag}</span></summary><div class="body">${withRefs(a.html+(a.svg?`<figure>${a.svg}<figcaption>${a.cap}</figcaption></figure>`:''))}</div></details>`).join('');
 
@@ -590,13 +596,13 @@ const TECH=[
 ];
 /* referencias por técnica (mismo orden que TECH): ind = indicaciones, pos = posición/acceso, s = pasos concretos, st = último paso, risk = riesgos */
 const TREF=[
- {ind:'sabiston,schwartz',pos:'sabiston',s:{2:'strasberg',3:'strasberg'},st:'sabiston',risk:'strasberg,sabiston'},
+ {ind:'sabiston,schwartz',pos:'sabiston',s:{2:'strasberg,netter@276',3:'strasberg,netter@276'},st:'sabiston',risk:'strasberg,sabiston'},
  {ind:'sabiston',pos:'sabiston,schwartz',st:'sabiston,schwartz',risk:'sabiston'},
- {ind:'herniasurge',pos:'lichtenstein,herniasurge',s:{0:'lichtenstein,herniasurge',3:'lichtenstein'},st:'lichtenstein',risk:'herniasurge'},
- {ind:'haugen,sabiston',pos:'sabiston',s:{1:'moore,sabiston',2:'moore,sabiston'},st:'sabiston',risk:'sabiston'},
+ {ind:'herniasurge',pos:'lichtenstein,herniasurge',s:{0:'lichtenstein,herniasurge,netter@243,netter@245',3:'lichtenstein'},st:'lichtenstein',risk:'herniasurge'},
+ {ind:'haugen,sabiston',pos:'sabiston',s:{1:'moore,sabiston,netter@69',2:'moore,sabiston,netter@69'},st:'sabiston',risk:'sabiston'},
  {ind:'sabiston',pos:'schwartz',s:{0:'sabiston'},st:'schwartz,sabiston',risk:'sabiston,schwartz'},
  {ind:'jgca,sabiston',pos:'sabiston',s:{0:'jgca',4:'jgca',5:'jgca'},st:'jgca,sabiston',risk:'sabiston'},
- {ind:'sabiston,schwartz',pos:'sabiston',s:{2:'hohenberger',3:'hohenberger'},st:'sabiston',risk:'sabiston,hohenberger'},
+ {ind:'sabiston,schwartz',pos:'sabiston',s:{2:'hohenberger,netter@287',3:'hohenberger'},st:'sabiston',risk:'sabiston,hohenberger'},
  {ind:'atls,sabiston',pos:'atls',s:{0:'rotondo',2:'sabiston',3:'rotondo'},st:'rotondo,sabiston',risk:'sabiston,rotondo'},
  {ind:'mitchell,sabiston',pos:'sabiston',s:{3:'sabiston'},st:'mitchell',risk:'mitchell,sabiston'}];
 $('#techList').innerHTML=TECH.map((t,i)=>{
@@ -661,7 +667,7 @@ $('#calcGrid').addEventListener('input',e=>{const card=e.target.closest('[data-i
 
 /* ---------- repaso ---------- */
 const QZ=[
- ['¿Qué estructura se encuentra lateral a los vasos epigástricos inferiores en el canal inguinal?',['Hernia directa (triángulo de Hesselbach)','Anillo inguinal profundo (hernia indirecta)','Anillo femoral'],1,'El anillo profundo y la hernia indirecta son laterales a los vasos epigástricos inferiores; la hernia directa es medial.','moore'],
+ ['¿Qué estructura se encuentra lateral a los vasos epigástricos inferiores en el canal inguinal?',['Hernia directa (triángulo de Hesselbach)','Anillo inguinal profundo (hernia indirecta)','Anillo femoral'],1,'El anillo profundo y la hernia indirecta son laterales a los vasos epigástricos inferiores; la hernia directa es medial.','moore,netter@243'],
  ['Durante la colecistectomía, ¿cuántas estructuras deben entrar a la vesícula en la visión crítica de seguridad?',['Una','Dos','Tres'],1,'Solo el conducto y la arteria cística. Una tercera estructura sugiere anatomía no identificada.','strasberg'],
  ['Un paciente de 70 kg pierde 1200 mL con FC 110 y presión normal. ¿Clase de shock?',['I','II','III'],1,'1200 mL es ~ 25 % de la volemia: clase II (15–30 %).','atls'],
  ['¿Qué fármaco está contraindicado en un paciente quemado de 5 días por riesgo de hiperpotasemia?',['Rocuronio','Succinilcolina','Propofol'],1,'La succinilcolina libera potasio por receptores extrajuncionales; evitar desde 24–48 h tras la quemadura.','martyn,miller'],
@@ -689,22 +695,23 @@ function blob(r,col,pos,sc=[1,1,1],rough=.55){const m=new THREE.Mesh(new THREE.S
 function cyl(r,h,col,pos,rot){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,20),new THREE.MeshStandardMaterial({color:col,roughness:.5}));m.position.set(...pos);if(rot)m.rotation.set(...rot);return m}
 const MODELS={
  corazon:{name:'Corazón y coronarias',build(){return [
-  {id:'lv',name:'Ventrículo izquierdo',col:'#c0392b',obj:blob(1,0xc0392b,[.5,-.4,0],[1,1.3,1]),d:'Pared de 8–12 mm. Su isquemia causa la mayoría de los infartos y la insuficiencia cardiaca. Abordaje de cirugía valvular mitral y aórtica por esternotomía.'},
-  {id:'rv',name:'Ventrículo derecho',col:'#5b7bc0',obj:blob(.9,0x5b7bc0,[-.5,-.3,.35],[1,1.2,.9]),d:'Cara anterior del corazón, por detrás del esternón: riesgo de lesión en reesternotomía y trauma penetrante.'},
+  {id:'lv',name:'Ventrículo izquierdo',col:'#c0392b',obj:(()=>{const m=blob(1,0xc0392b,[.62,-.55,-.3],[.95,1.35,.95]);m.rotation.z=.45;return m})(),d:'Pared de 8–12 mm. Su isquemia causa la mayoría de los infartos y la insuficiencia cardiaca. Abordaje de cirugía valvular mitral y aórtica por esternotomía.'},
+  {id:'rv',name:'Ventrículo derecho',col:'#5b7bc0',obj:(()=>{const m=blob(.9,0x5b7bc0,[-.18,-.45,.4],[1.05,1.15,.85]);m.rotation.z=.35;return m})(),d:'Cara anterior del corazón, por detrás del esternón: riesgo de lesión en reesternotomía y trauma penetrante.'},
   {id:'la',name:'Aurícula izquierda',col:'#e07a6e',obj:blob(.55,0xe07a6e,[.6,.85,-.55]),d:'Su orejuela es sitio de trombos en fibrilación auricular; puede ocluirse o resecarse quirúrgicamente.'},
-  {id:'ra',name:'Aurícula derecha',col:'#7d96d1',obj:blob(.65,0x7d96d1,[-.9,.5,-.05]),d:'Sitio habitual de canulación venosa para circulación extracorpórea.'},
-  {id:'ao',name:'Aorta ascendente y arco',col:'#d9534f',obj:tubeOf([[.25,.9,0],[.25,1.8,-.05],[.5,2.3,-.3],[1,2,-.7],[1.1,1,-.8]],.28,0xd9534f),d:'Sitio de canulación arterial, pinzamiento aórtico y cardioplejía. Las coronarias nacen de los senos de Valsalva.'},
-  {id:'pa',name:'Tronco pulmonar',col:'#6a89d0',obj:tubeOf([[-.15,.9,.5],[-.15,1.7,.3],[-.7,2.2,-.25]],.25,0x6a89d0),d:'Sale del ventrículo derecho y se bifurca en las arterias pulmonares. Ligamento arterioso (restos del conducto).'},
-  {id:'svc',name:'Vena cava superior',col:'#4f6fb5',obj:cyl(.2,1.4,0x4f6fb5,[-1.05,1.45,-.1]),d:'Drena la parte superior del cuerpo a la aurícula derecha. Se canula en cirugía cardiaca para bypass bicaval.'},
-  {id:'ivc',name:'Vena cava inferior',col:'#4f6fb5',obj:cyl(.22,1.2,0x4f6fb5,[-1.05,-.5,-.15]),d:'Retorno venoso de abdomen y miembros inferiores.'},
-  {id:'lad',name:'Arteria descendente anterior',col:'#ffd23f',obj:tubeOf([[.2,.95,.7],[.1,.4,.98],[.0,-.5,1.07],[.15,-1.3,.9]],.06,0xffd23f),d:'Nace de la coronaria izquierda y recorre el surco interventricular anterior. Irriga la pared anterior y el septo (“la viuda”). Injerto habitual con arteria mamaria interna izquierda (LIMA).'},
-  {id:'lcx',name:'Arteria circunfleja',col:'#ffb830',obj:tubeOf([[.35,.95,.65],[.95,.55,.55],[1.3,-.1,.2],[1.25,-.9,-.3]],.055,0xffb830),d:'Recorre el surco auriculoventricular izquierdo. Irriga la pared lateral; en dominancia izquierda da la descendente posterior.'},
-  {id:'rca',name:'Arteria coronaria derecha',col:'#ff9f1c',obj:tubeOf([[-.05,1.05,.65],[-.8,.7,.75],[-1.35,.0,.55],[-1.2,-.9,.25],[-.7,-1.35,-.2]],.06,0xff9f1c),d:'Irriga ventrículo derecho, nodo sinusal (~ 60 %) y nodo AV (~ 80 %). Su oclusión causa infarto inferior y bloqueos.'}
+  {id:'ra',name:'Aurícula derecha',col:'#7d96d1',obj:blob(.65,0x7d96d1,[-1.0,.35,0]),d:'Sitio habitual de canulación venosa para circulación extracorpórea.'},
+  {id:'ao',name:'Aorta ascendente y arco',col:'#d9534f',obj:tubeOf([[-.1,.85,.15],[-.2,1.75,.05],[.2,2.35,-.3],[.85,2.15,-.75],[1.0,1.0,-.9]],.28,0xd9534f),d:'Sitio de canulación arterial, pinzamiento aórtico y cardioplejía. Las coronarias nacen de los senos de Valsalva.'},
+  {id:'pa',name:'Tronco pulmonar',col:'#6a89d0',obj:tubeOf([[.2,.72,.75],[.4,1.5,.6],[.62,1.85,.15],[.48,1.95,-.3]],.25,0x6a89d0),d:'Sale del ventrículo derecho y se bifurca en las arterias pulmonares. Ligamento arterioso (restos del conducto).'},
+  {id:'svc',name:'Vena cava superior',col:'#4f6fb5',obj:cyl(.2,1.4,0x4f6fb5,[-.85,1.45,-.1]),d:'Drena la parte superior del cuerpo a la aurícula derecha. Se canula en cirugía cardiaca para bypass bicaval.'},
+  {id:'ivc',name:'Vena cava inferior',col:'#4f6fb5',obj:cyl(.22,1.2,0x4f6fb5,[-.95,-.55,-.25]),d:'Retorno venoso de abdomen y miembros inferiores.'},
+  {id:'lad',name:'Arteria descendente anterior',col:'#ffd23f',obj:tubeOf([[.42,.72,.42],[.5,.3,.72],[.58,-.35,.92],[.7,-1.05,.74],[.82,-1.7,.25]],.06,0xffd23f),d:'Nace de la coronaria izquierda y recorre el surco interventricular anterior. Irriga la pared anterior y el septo (“la viuda”). Injerto habitual con arteria mamaria interna izquierda (LIMA).'},
+  {id:'lcx',name:'Arteria circunfleja',col:'#ffb830',obj:tubeOf([[.4,.8,.45],[1.1,.55,.25],[1.38,0,-.3],[1.05,-.5,-.85]],.055,0xffb830),d:'Recorre el surco auriculoventricular izquierdo. Irriga la pared lateral; en dominancia izquierda da la descendente posterior.'},
+  {id:'rca',name:'Arteria coronaria derecha',col:'#ff9f1c',obj:tubeOf([[-.15,.85,.5],[-.75,.55,.78],[-1.2,-.1,.62],[-1.05,-.9,.22],[-.45,-1.3,-.38]],.06,0xff9f1c),d:'Irriga ventrículo derecho, nodo sinusal (~ 60 %) y nodo AV (~ 80 %). Su oclusión causa infarto inferior y bloqueos.'},
+  {id:'pda',name:'Arteria descendente posterior',col:'#e8890c',obj:tubeOf([[-.45,-1.3,-.38],[.05,-1.4,-.62],[.55,-1.6,-.5]],.055,0xe8890c),d:'Recorre el surco interventricular posterior hacia el vértice. En la dominancia derecha, la más frecuente, nace de la arteria coronaria derecha e irriga la cara inferior y el tercio posterior del septo.'}
  ]}},
- abdomen:{name:'Abdomen superior',build(){const bil=tubeOf([[-.6,.3,.5],[-.35,-.1,.2],[-.15,-.4,-.25],[.1,-.8,-.4]],.07,0x55b45a);
-  const cys=tubeOf([[-.85,.2,.5],[-.65,.1,.45],[-.4,-.1,.2]],.05,0x2e8b57);
+ abdomen:{name:'Abdomen superior',build(){const bil=tubeOf([[-.5,.62,.25],[-.55,.35,.35],[-.62,0,.12],[-.78,-.3,-.08],[-.88,-.38,-.12]],.07,0x55b45a);
+  const cys=tubeOf([[-.9,.28,.55],[-.72,.36,.45],[-.56,.34,.36]],.05,0x2e8b57);
   const ao=cyl(.17,3.8,0xd9534f,[.45,-.3,-1.05]);const ivc=cyl(.2,3.8,0x4f6fb5,[-.1,-.3,-1.0]);
-  const colon=tubeOf([[-2.1,-1.8,.2],[-2.2,0,.2],[-2,1.3,.3],[-.5,1.7,.5],[1.2,1.4,.5],[2.1,1.2,.3],[2.1,-.1,.2],[2.1,-1.8,.2]],.2,0xd8b48a,80);
+  const colon=tubeOf([[-2.1,-1.8,.2],[-2.2,-.2,.2],[-1.9,.9,.4],[-.8,.2,.8],[.6,.3,.8],[1.6,1.1,.5],[2.15,1.55,.1],[2.2,.2,.1],[2.1,-1.8,.2]],.2,0xd8b48a,90);
   const sb=new THREE.Mesh(new THREE.TorusKnotGeometry(.5,.18,120,14,3,5),new THREE.MeshStandardMaterial({color:0xe3a1a1,roughness:.5}));sb.position.set(0,-1.45,.4);sb.scale.set(1.25,.75,.7);
   return [
   {id:'liver',name:'Hígado',col:'#8c4a2f',obj:blob(1,0x8c4a2f,[-1.15,.65,.1],[1.65,.95,1.05]),d:'Mayor víscera sólida. Ocho segmentos de Couinaud. Trauma abdominal cerrado: laceración y hemorragia. Maniobra de Pringle (pinzar el pedículo) para controlar sangrado.'},
@@ -713,7 +720,11 @@ const MODELS={
   {id:'cbd',name:'Colédoco',col:'#55b45a',obj:bil,d:'Se forma por la unión del cístico con el hepático común y desemboca en la ampolla de Vater junto al conducto pancreático. Su lesión es la complicación grave más temida de la colecistectomía laparoscópica.'},
   {id:'st',name:'Estómago',col:'#e0a6a0',obj:blob(.9,0xe0a6a0,[1.05,.8,.5],[1.25,.9,.75]),d:'Irrigación por arcos de curvatura menor (gástrica izquierda y derecha) y mayor (gastroepiploicas). Úlcera perforada típica en duodeno proximal o antro.'},
   {id:'sp',name:'Bazo',col:'#7b4b94',obj:blob(.5,0x7b4b94,[2.05,.65,-.5],[.7,1.1,.5]),d:'Órgano más lesionado en trauma cerrado de abdomen. Esplenectomía exige vacunación contra encapsulados.'},
-  {id:'pan',name:'Páncreas',col:'#e8c04a',obj:blob(.3,0xe8c04a,[.3,-.05,-.55],[3.6,.8,.9]),d:'Retroperitoneal, anterior a la vena porta/mesentérica superior. La arteria esplénica corre en su borde superior. Pancreatitis y cirugía de Whipple.'},
+  {id:'pan',name:'Páncreas',col:'#e8c04a',obj:(()=>{const m=blob(.3,0xe8c04a,[.3,-.05,-.45],[3.6,.8,.9]);m.rotation.z=.15;return m})(),d:'Retroperitoneal, anterior a la vena porta/mesentérica superior. La arteria esplénica corre en su borde superior. Pancreatitis y cirugía de Whipple.'},
+  {id:'duo',name:'Duodeno',col:'#d98c8c',obj:tubeOf([[.05,.4,.45],[-.55,.32,.3],[-.95,.05,.05],[-.98,-.45,-.1],[-.55,-.78,-.3],[.2,-.72,-.45],[.62,-.4,-.45]],.16,0xd98c8c,60),d:'Forma una "C" alrededor de la cabeza del páncreas. Su porción descendente (2.ª) recibe el colédoco y el conducto pancreático en la papila mayor (de Vater). Se moviliza con la maniobra de Kocher.'},
+  {id:'pv',name:'Vena porta',col:'#3f5fa8',obj:tubeOf([[.15,-.2,-.35],[-.15,.15,-.15],[-.45,.55,.05]],.1,0x3f5fa8),d:'Se forma detrás del cuello del páncreas por la unión de las venas mesentérica superior y esplénica. Asciende en el ligamento hepatoduodenal, por detrás del colédoco y de la arteria hepática.'},
+  {id:'cel',name:'Tronco celíaco y ramas',col:'#e2574c',obj:(()=>{const g=new THREE.Group();g.add(tubeOf([[.45,.4,-.95],[.45,.45,-.6]],.07,0xe2574c));g.add(tubeOf([[.45,.45,-.6],[0,.5,-.3],[-.45,.62,.12]],.05,0xe2574c));g.add(tubeOf([[.45,.45,-.6],[1.1,.4,-.55],[1.85,.55,-.5]],.05,0xe2574c));return g})(),d:'Nace de la aorta a nivel de T12 y se divide en gástrica izquierda, hepática común (hacia el hígado) y esplénica, que recorre el borde superior del páncreas hacia el bazo.'},
+  {id:'sma',name:'Arteria mesentérica superior',col:'#e2574c',obj:tubeOf([[.45,.1,-.95],[.42,-.25,-.25],[.3,-1.1,.15]],.06,0xe2574c),d:'Nace de la aorta a nivel de L1, pasa por detrás del cuello del páncreas y por delante de la porción horizontal del duodeno. Irriga el intestino medio.'},
   {id:'kid',name:'Riñones',col:'#7a2e2e',obj:(()=>{const g=new THREE.Group();[[-.95,-.35,-1.15],[1.2,-.1,-1.15]].forEach(p=>{const m=blob(.5,0x7a2e2e,p,[.7,1.2,.6]);g.add(m)});return g})(),d:'Retroperitoneales. Pedículo renal: vena anterior, arteria, pelvis posterior. El riñón izquierdo es más alto que el derecho.'},
   {id:'ao',name:'Aorta abdominal',col:'#d9534f',obj:ao,d:'Desciende a la izquierda de la línea media; da celíaco (T12), mesentérica superior (L1), renales (L1–L2) y mesentérica inferior (L3). Bifurca en L4.'},
   {id:'ivc',name:'Vena cava inferior',col:'#4f6fb5',obj:ivc,d:'A la derecha de la aorta. Lesión de IVC infrarrenal en trauma: sangrado profuso que requiere compresión directa.'},
@@ -736,7 +747,7 @@ function initViewer(){
     const l2=new THREE.DirectionalLight(0xffffff,.35);l2.position.set(-4,-2,-5);scene.add(l2);
     const root=new THREE.Group();scene.add(root);
     V={renderer,scene,camera,root,host,parts:[],sel:null,
-      reset(){root.rotation.set(.15,-.4,0);camera.position.set(0,0,this.dist=9)}};
+      reset(){root.rotation.set(.1,.2,0);camera.position.set(0,0,this.dist=9)}};
     V.reset();
     function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
     new ResizeObserver(resize).observe(host);resize();
@@ -776,8 +787,15 @@ function select(id){
   V.parts.forEach(p=>meshesOf(p.obj).forEach(m=>{m.material.opacity=(!id||p.id===id)?1:.22;m.material.emissive.setHex(p.id===id?0x333333:0)}));
   document.querySelectorAll('#parts [data-s]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===id));
   const p=V.parts.find(p=>p.id===id);
-  const PREF={gb:'moore,sabiston',cys:'strasberg,moore',cbd:'strasberg,moore',liver:'moore,sabiston',sp:'sabiston,moore',pan:'moore,sabiston',ao:'moore,sabiston',ivc:'moore,atls',lad:'moore,sabiston',lcx:'moore',rca:'moore',ra:'moore,sabiston',svc:'moore,sabiston'};
-  $('#pinfo').innerHTML=p?withRefs(`<b>${p.name}</b><p>${p.d}{{${PREF[p.id]||'moore'}}}</p>`):'Seleccione una estructura de la lista o tóquela en el modelo.';
+  const PREF={
+   'corazon:lv':'moore,netter@201,netter@209','corazon:rv':'moore,sabiston,netter@201,netter@208','corazon:la':'moore,netter@209','corazon:ra':'moore,sabiston,netter@208',
+   'corazon:ao':'moore,sabiston,netter@201','corazon:pa':'moore,netter@201','corazon:svc':'moore,sabiston,netter@201','corazon:ivc':'moore,netter@202',
+   'corazon:lad':'moore,sabiston,netter@204','corazon:lcx':'moore,netter@204','corazon:rca':'moore,netter@204,netter@205','corazon:pda':'moore,netter@204,netter@205',
+   'abdomen:liver':'moore,sabiston,netter@269,netter@270','abdomen:gb':'moore,sabiston,netter@276','abdomen:cys':'strasberg,moore,netter@276,netter@277','abdomen:cbd':'strasberg,moore,netter@276,netter@278',
+   'abdomen:st':'moore,netter@258,netter@282','abdomen:sp':'sabiston,moore,netter@281','abdomen:pan':'moore,sabiston,netter@279','abdomen:duo':'moore,sabiston,netter@261,netter@279',
+   'abdomen:pv':'moore,netter@279,netter@290','abdomen:cel':'moore,netter@282','abdomen:sma':'moore,netter@279,netter@286','abdomen:kid':'moore,netter@311',
+   'abdomen:ao':'moore,sabiston,netter@247','abdomen:ivc':'moore,atls,netter@248','abdomen:colon':'moore,netter@287','abdomen:sb':'moore,netter@253'};
+  $('#pinfo').innerHTML=p?withRefs(`<b>${p.name}</b><p>${p.d}{{${PREF[curKey+':'+p.id]||'moore'}}}</p>`):'Seleccione una estructura de la lista o tóquela en el modelo.';
 }
 $('#parts').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b)select(V.sel===b.dataset.s?null:b.dataset.s)});
 $('#parts').addEventListener('change',e=>{const c=e.target.dataset.v;if(!c)return;const p=V.parts.find(p=>p.id===c);p.obj.visible=e.target.checked});
