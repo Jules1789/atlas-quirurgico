@@ -151,6 +151,12 @@ a.home-card:hover{border-color:var(--accent)} a.home-card.red:hover{border-color
   .top-in{justify-content:center}
   body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
 }
+/* esquemas ampliables: tocar abre a pantalla completa */
+figure svg{cursor:zoom-in}
+figure.fig-zoom{position:fixed;inset:0;z-index:60;margin:0;border:0;border-radius:0;background:var(--bg);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 56px) max(12px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+figure.fig-zoom svg{width:min(1100px,200vw);max-width:none;max-height:none!important;cursor:zoom-out}
+figure.fig-zoom figcaption{max-width:70ch}
+.fig-close{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:max(12px,env(safe-area-inset-right,0px));z-index:61}
 /* textos de los esquemas inguinales */
 .ig-t{fill:var(--ink);font:500 13px var(--sans)} .ig-s{fill:var(--muted);font:12px var(--sans)}
 .ig-r{fill:var(--alert);font:600 13px var(--sans)} .ig-b{fill:var(--accent);font:600 13px var(--sans)}
@@ -208,7 +214,7 @@ caption{caption-side:bottom;text-align:left;font-size:.75rem;color:var(--muted);
 
 <section id="s-anatomia" hidden>
   <div class="kicker">Módulo 1</div><h2>Anatomía quirúrgica</h2>
-  <p class="lead">Cada tema resume lo que el cirujano debe identificar, las variantes que cambian la conducta y la estructura que se lesiona con más frecuencia.</p>
+  <p class="lead">Cada tema resume lo que el cirujano debe identificar, las variantes que cambian la conducta y la estructura que se lesiona con más frecuencia. Toque un esquema para verlo ampliado.</p>
   <div id="anatList"></div>
 </section>
 
@@ -525,6 +531,33 @@ const SVG_TIROIDES=`<svg viewBox="0 0 560 525" style="max-height:none" role="img
 <text x="190" y="432" class="ig-s" text-anchor="middle">Arco aórtico</text>
 <text x="280" y="518" class="ig-s" text-anchor="middle">Vista posterior: el lado derecho del paciente queda a la derecha</text>
 </svg>`;
+/* Esquema propio de la irrigación del colon en vista anterior (verificado con Netter, láminas 287 y 289) */
+const colonMark=(n,x,y)=>`<circle cx="${x}" cy="${y}" r="10" style="fill:var(--surface);stroke:var(--ink)" stroke-width="1.5"/><text x="${x}" y="${y+4}" text-anchor="middle" style="fill:var(--ink);font:600 11px var(--sans)">${n}</text>`;
+const SVG_COLON=`<svg viewBox="0 0 560 625" style="max-height:none" role="img" aria-label="Irrigación del colon: arterias mesentéricas superior e inferior, arco marginal, arco de Riolano y puntos de Griffiths y Sudeck">
+<path d="M110,410 C95,400 92,380 95,350 L95,140 C95,105 120,100 150,108 C220,150 300,172 370,140" style="stroke:var(--accent)" stroke-width="26" stroke-linecap="round" fill="none" opacity=".28"/>
+<path d="M370,140 C395,128 410,110 420,95 C445,72 470,70 472,100 L472,320 C472,360 440,360 400,380 C350,405 330,420 315,445 L310,495" style="stroke:var(--alert)" stroke-width="26" stroke-linecap="round" fill="none" opacity=".24"/>
+<path d="M285,28 L285,392" style="stroke:var(--alert)" stroke-width="10" stroke-linecap="round" fill="none"/>
+<path d="M122,392 L118,150 C118,128 140,128 160,134 C225,170 300,190 372,160 C400,148 420,128 432,112 C446,96 452,104 452,120 L452,318 C452,340 425,346 392,362 C352,382 335,398 326,422" style="stroke:var(--alert)" stroke-width="2.5" fill="none"/>
+<path d="M285,120 C270,180 245,260 220,380" style="stroke:var(--alert)" stroke-width="6" stroke-linecap="round" fill="none"/>
+<path d="M280,150 C276,166 264,175 250,176 M250,176 C232,172 212,160 196,150 M262,175 C290,186 314,184 336,178" style="stroke:var(--alert)" stroke-width="3.5" fill="none"/>
+<path d="M264,205 C220,204 160,207 119,210" style="stroke:var(--alert)" stroke-width="3.5" fill="none"/>
+<path d="M248,270 C200,300 150,340 121,382" style="stroke:var(--alert)" stroke-width="3.5" fill="none"/>
+<path d="M268,170 C345,200 338,290 322,338" style="stroke:var(--alert)" stroke-width="2.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M285,330 C315,336 335,344 352,354" style="stroke:var(--alert)" stroke-width="5" stroke-linecap="round" fill="none"/>
+<path d="M318,338 C380,320 430,272 452,240 M405,292 C440,250 450,190 452,150" style="stroke:var(--alert)" stroke-width="3.5" fill="none"/>
+<path d="M346,351 C375,356 405,356 430,348 M350,356 C366,376 378,382 390,370" style="stroke:var(--alert)" stroke-width="3" fill="none"/>
+<path d="M352,356 C337,392 322,424 316,470" style="stroke:var(--alert)" stroke-width="3.5" fill="none"/>
+<circle cx="444" cy="106" r="17" style="fill:none;stroke:var(--alert)" stroke-width="2.5" stroke-dasharray="4 3"/>
+<circle cx="338" cy="404" r="16" style="fill:none;stroke:var(--alert)" stroke-width="2.5" stroke-dasharray="4 3"/>
+<text x="552" y="34" class="ig-r" text-anchor="end">Punto de Griffiths</text><text x="552" y="49" class="ig-s" text-anchor="end">ángulo esplénico</text><line x1="500" y1="54" x2="456" y2="94" style="stroke:var(--muted)"/>
+<text x="552" y="462" class="ig-r" text-anchor="end">Punto de Sudeck</text><text x="552" y="477" class="ig-s" text-anchor="end">unión rectosigmoidea</text><line x1="440" y1="458" x2="352" y2="412" style="stroke:var(--muted)"/>
+<text x="40" y="460" class="ig-s">Ciego</text><text x="300" y="512" class="ig-s">Recto</text>
+${colonMark(1,285,62)}${colonMark(2,240,300)}${colonMark(3,214,160)}${colonMark(4,186,207)}${colonMark(5,176,336)}${colonMark(6,308,336)}${colonMark(7,382,302)}${colonMark(8,408,356)}${colonMark(9,318,456)}${colonMark(10,119,290)}${colonMark(11,336,250)}
+<rect x="20" y="532" width="14" height="10" rx="2" style="fill:var(--accent)" opacity=".45"/><text x="40" y="542" class="ig-s">Territorio de la AMS (intestino medio)</text>
+<rect x="290" y="532" width="14" height="10" rx="2" style="fill:var(--alert)" opacity=".4"/><text x="310" y="542" class="ig-s">Territorio de la AMI (intestino posterior)</text>
+<g class="ig-t"><text x="20" y="566">1 Aorta</text><text x="20" y="582">2 A. mesentérica superior (L1)</text><text x="20" y="598">3 Cólica media</text><text x="20" y="614">4 Cólica derecha · 5 Ileocólica</text>
+<text x="290" y="566">6 A. mesentérica inferior (L3)</text><text x="290" y="582">7 Cólica izquierda · 8 Sigmoideas</text><text x="290" y="598">9 Rectal superior</text><text x="290" y="614">10 Arco marginal · 11 Arco de Riolano</text></g>
+</svg>`;
 const ANAT=[
 {t:'Triángulo hepatocístico (de Calot) y vía biliar',tag:'Colecistectomía',svg:SVG_CALOT,cap:'Esquema: el triángulo se limita por el conducto cístico, el hepático común y el borde inferior del hígado.{{strasberg,moore,netter@276}}',html:`
 <ul class="tight"><li><b>Contenido:</b> arteria cística (rama de la hepática derecha), ganglio de Lund, tejido linfograso.{{moore,sabiston,netter@276}}</li>
@@ -553,12 +586,14 @@ const ANAT=[
 <li><b>Venas hepáticas</b> (derecha, media, izquierda) corren entre segmentos; el pedículo portal corre en su centro.{{moore,netter@273}}</li>
 <li>El segmento I (caudado) drena directamente a la vena cava.{{moore,sabiston}}</li>
 <li>Para resecar con seguridad se requiere un remanente con ≥ 25–30 % del volumen hepático en hígado sano (más en cirrosis o quimioterapia).{{sabiston}}</li></ul>`},
-{t:'Irrigación del colon y puntos críticos',tag:'Colectomías',html:`
+{t:'Irrigación del colon y puntos críticos',tag:'Colectomías',figs:[
+ {svg:SVG_COLON,cap:'Esquema propio en vista anterior. La AMS irriga desde el ciego hasta cerca de los dos tercios del colon transverso por las arterias ileocólica, cólica derecha y cólica media; la AMI irriga el resto por las arterias cólica izquierda, sigmoideas y rectal superior. El arco marginal recorre el borde mesentérico del colon y el arco de Riolano une las cólicas media e izquierda cerca de la raíz del mesenterio.{{netter@287,netter@289,moore}} Los puntos de Griffiths y Sudeck son zonas de circulación colateral débil.{{moore,sabiston}}'}],html:`
 <div class="tbl"><table><caption>Fuente: {{moore,sabiston,netter@282,netter@286,netter@287}}</caption><tr><th>Arteria</th><th>Nivel</th><th>Territorio</th></tr>
 <tr><td>Tronco celíaco</td><td class="num">T12</td><td>Intestino anterior (estómago, hígado, bazo, páncreas)</td></tr>
 <tr><td>Mesentérica superior</td><td class="num">L1</td><td>Duodeno distal a yeyuno-íleon, colon derecho y transverso proximal</td></tr>
 <tr><td>Mesentérica inferior</td><td class="num">L3</td><td>Colon izquierdo (desde ⅔ distales del transverso) y recto alto</td></tr></table></div>
 <ul class="tight"><li><b>Arco marginal de Drummond</b> y <b>arcada de Riolano</b> conectan ambos territorios.{{moore,netter@287}}</li>
+<li><b>Variaciones:</b> la arteria cólica derecha puede faltar o nacer de un tronco común con la ileocólica o con la cólica media; la cólica media también puede faltar y ser reemplazada por una rama gruesa de la cólica izquierda.{{netter@289}}</li>
 <li><b>Puntos críticos de isquemia (watershed):</b> punto de Griffiths (ángulo esplénico) y de Sudeck (unión rectosigmoidea).{{moore,sabiston}}</li>
 <li>En la ligadura alta de la arteria mesentérica inferior, proteger el plexo hipogástrico superior y el uréter izquierdo.{{sabiston}}</li></ul>`},
 {t:'Capas de la pared abdominal e incisiones',tag:'Acceso',html:`
@@ -902,6 +937,14 @@ $('#parts').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if
 $('#parts').addEventListener('change',e=>{const c=e.target.dataset.v;if(!c)return;const p=V.parts.find(p=>p.id===c);p.obj.visible=e.target.checked});
 
 document.querySelectorAll('[data-refs]').forEach(e=>{e.innerHTML=withRefs(e.innerHTML)});
+/* Ampliar esquemas: tocar el dibujo lo abre a pantalla completa; tocar de nuevo, Cerrar o Esc lo cierra */
+const figClose=document.createElement('button');figClose.className='btn fig-close';figClose.type='button';figClose.textContent='Cerrar';figClose.hidden=true;document.body.append(figClose);
+function closeFig(){const z=document.querySelector('figure.fig-zoom');if(z)z.classList.remove('fig-zoom');figClose.hidden=true;document.body.style.overflow=''}
+document.addEventListener('click',e=>{const s=e.target.closest('figure svg');if(!s)return;const fig=s.closest('figure');
+  if(fig.classList.contains('fig-zoom'))return closeFig();closeFig();fig.classList.add('fig-zoom');figClose.hidden=false;document.body.style.overflow='hidden';fig.scrollTo(0,0)});
+figClose.addEventListener('click',closeFig);
+addEventListener('keydown',e=>{if(e.key==='Escape')closeFig()});
+addEventListener('hashchange',closeFig);
 show(location.hash.slice(1)||'inicio');
 </script>
 
