@@ -22,7 +22,7 @@
 :root{
   --bg:#ffffff; --surface:#ffffff; --soft:#f4f5f7; --ink:#0b0d12; --muted:#5b6170; --line:#e2e4e9;
   --accent:#1f4fd1; --accent-ink:#ffffff; --accent-soft:#eaf0ff; --alert:#d62839; --alert-soft:#fdecee;
-  --warn:#0b0d12; --warn-soft:#f4f5f7;
+  --warn:#0b0d12; --warn-soft:#f4f5f7; --bile:#2e8b47;
   --serif:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
   --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
   --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
@@ -30,11 +30,11 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0b0d12; --surface:#11141b; --soft:#171b23; --ink:#f3f4f6; --muted:#9aa1ae; --line:#252b36;
   --accent:#7aa2ff; --accent-ink:#0b0d12; --accent-soft:#18223b; --alert:#ff6b78; --alert-soft:#36191d;
-  --warn:#f3f4f6; --warn-soft:#171b23; color-scheme:dark}}
+  --warn:#f3f4f6; --warn-soft:#171b23; --bile:#5cc985; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0b0d12; --surface:#11141b; --soft:#171b23; --ink:#f3f4f6; --muted:#9aa1ae; --line:#252b36;
   --accent:#7aa2ff; --accent-ink:#0b0d12; --accent-soft:#18223b; --alert:#ff6b78; --alert-soft:#36191d;
-  --warn:#f3f4f6; --warn-soft:#171b23; color-scheme:dark}
+  --warn:#f3f4f6; --warn-soft:#171b23; --bile:#5cc985; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
@@ -115,7 +115,7 @@ footer{color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);paddi
 .brand svg{flex:none}
 nav.tabs button{display:flex;align-items:center;gap:.4rem}
 nav.tabs .lbl-s{display:none}
-.hero-art{padding:.8rem}
+.hero-art{padding:.8rem} .hero-art svg{width:100%;height:100%;display:block}
 .ico-tile{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);flex:none}
 .red .ico-tile{background:var(--alert-soft);color:var(--alert)}
 a.home-card{display:flex;flex-direction:column;gap:.55rem;text-decoration:none;color:var(--ink);transition:border-color .15s}
@@ -183,6 +183,10 @@ figure.fig-zoom figcaption{max-width:70ch}
 .ig-t{fill:var(--ink);font:500 13px var(--sans)} .ig-s{fill:var(--muted);font:12px var(--sans)}
 .ig-r{fill:var(--alert);font:600 13px var(--sans)} .ig-b{fill:var(--accent);font:600 13px var(--sans)}
 .ig-t,.ig-s,.ig-r,.ig-b{paint-order:stroke;stroke:var(--soft);stroke-width:4px;stroke-linejoin:round}
+/* colores de órganos en los esquemas (iguales en ambos temas) */
+.o-liver{fill:#e2b195;stroke:#9a5a3c} .o-liver2{fill:#d69e80;stroke:#9a5a3c} .o-liver3{fill:#ecc3aa;stroke:#9a5a3c}
+.o-gb{fill:#a9dbb2;stroke:var(--bile)} .o-duo{fill:#f3c7bd;stroke:#c27565} .o-st{fill:#f4cdc6;stroke:#c27565}
+.o-sp{fill:#cfb2d8;stroke:#7d5590} .o-thy{fill:#efb3aa;stroke:#b5574a} .o-para{fill:#f1d37a;stroke:#a8841f} .o-bl{fill:#f5ebb5;stroke:#b39d45}
 /* app instalable */
 .install{padding:.4rem .85rem;font-size:.82rem;white-space:nowrap;flex:none}
 .install-tip{display:flex;gap:.8rem;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--accent-soft);color:var(--ink);border-radius:8px;padding:.7rem 1rem;margin-bottom:1rem;font-size:.9rem}
@@ -481,31 +485,70 @@ $('#homeCards').innerHTML=[
  ['calculadoras','Calculadoras','Ranson, BISAP, APACHE II, Child-Pugh, Glasgow, Parkland, Cockcroft-Gault y más, con buscador.'],
  ['listas','Mis listas','Guarde temas, técnicas, fármacos y calculadoras en listas propias para repasarlos.']
 ].map(([id,t,d])=>`<a class="card home-card ${COL[id]}" href="#${id}"><span class="ico-tile">${ico(id,24)}</span><h3>${t}</h3><p>${d}</p><span class="go">Abrir →</span></a>`).join('');
-$('#heroArt').innerHTML=`<svg viewBox="0 0 400 300" style="width:100%;height:100%" role="img" aria-label="Esquema del triángulo hepatocístico">
-<path d="M0 70 C80 40 200 30 400 60 L400 0 L0 0Z" style="fill:var(--soft);stroke:var(--muted)" stroke-width="1"/>
-<path d="M95 100 C60 120 60 210 110 225 C160 235 175 160 150 118 Z" style="fill:var(--surface);stroke:var(--ink)" stroke-width="2"/>
-<path d="M150 118 C175 135 200 150 222 163" style="stroke:var(--accent)" stroke-width="9" fill="none" stroke-linecap="round"/>
-<path d="M225 60 L225 270" style="stroke:var(--accent)" stroke-width="12" stroke-linecap="round"/>
-<path d="M120 105 C170 90 215 130 232 142" style="stroke:var(--alert)" stroke-width="4" fill="none"/>
-<path d="M225 60 L150 118 L225 165 Z" style="fill:var(--alert);fill-opacity:.06;stroke:var(--ink)" stroke-dasharray="5 4" stroke-width="1.5"/>
-<text x="20" y="35" class="svgm">Hígado</text><text x="242" y="100" class="svgt">Hepático común / colédoco</text><text x="242" y="140" class="svgt" style="fill:var(--alert)">Arteria cística</text><text x="242" y="185" class="svgt">Conducto cístico</text><text x="62" y="255" class="svgt">Vesícula</text></svg>`;
+
 
 /* ---------- anatomía ---------- */
-const SVG_COUINAUD=`<svg viewBox="0 0 330 170" role="img" aria-label="Segmentos hepáticos de Couinaud, vista anterior"><defs><clipPath id="lv"><path d="M20 90 C20 40 90 15 170 20 C250 25 300 50 310 95 C300 130 200 150 110 140 C60 135 20 120 20 90Z"/></clipPath></defs>
-<g clip-path="url(#lv)"><rect x="0" y="0" width="110" height="85" style="fill:var(--surface)"/><rect x="0" y="85" width="110" height="90" style="fill:var(--accent-soft)"/>
-<rect x="110" y="0" width="80" height="85" style="fill:var(--accent-soft)"/><rect x="110" y="85" width="80" height="90" style="fill:var(--surface)"/>
-<rect x="190" y="0" width="55" height="170" style="fill:var(--alert-soft)"/><rect x="245" y="0" width="90" height="85" style="fill:var(--accent-soft)"/><rect x="245" y="85" width="90" height="90" style="fill:var(--surface)"/>
-<path d="M110 0V175M190 0V175M0 85H335" style="stroke:var(--accent)" stroke-width="1.5" stroke-dasharray="4 3" fill="none"/><path d="M245 0V175" style="stroke:var(--alert)" stroke-width="1.5" fill="none"/></g>
+/* Esquema propio de los segmentos de Couinaud, vista anterior: los límites siguen las venas hepáticas y el plano portal (verificado con Netter, láminas 272–273) */
+const SVG_COUINAUD=`<svg viewBox="0 0 360 220" role="img" aria-label="Segmentos hepáticos de Couinaud con vena cava inferior, venas hepáticas, vena porta, ligamento falciforme y vesícula">
+<defs><clipPath id="lv"><path d="M20 90 C20 40 90 15 170 20 C250 25 300 50 310 95 C300 130 200 150 110 140 C60 135 20 120 20 90Z"/></clipPath></defs>
+<g clip-path="url(#lv)" stroke-width=".8">
+<path d="M0,0 L212,0 L212,26 L143.5,88 L0,88 Z" class="o-liver"/>
+<path d="M0,88 L143.5,88 L75,150 L75,220 L0,220 Z" class="o-liver2"/>
+<path d="M212,26 L143.5,88 L197,88 Z" class="o-liver2"/>
+<path d="M143.5,88 L197,88 L182,150 L182,220 L75,220 L75,150 Z" class="o-liver"/>
+<path d="M212,0 L232,0 L232,26 L244,88 L197,88 L212,26 Z" class="o-liver3"/>
+<path d="M197,88 L244,88 L258,160 L258,220 L182,220 L182,150 Z" class="o-liver3"/>
+<path d="M232,0 L360,0 L360,95 L340,92 L238,47 L232,26 Z" class="o-liver2"/>
+<path d="M238,47 L340,92 L360,95 L360,220 L258,220 L258,160 L244,88 Z" class="o-liver"/>
+<path d="M20,88 H244" style="stroke:var(--muted)" stroke-width="1.5" stroke-dasharray="5 4" fill="none"/>
+<path d="M212,26 L75,150 M212,26 L182,150 M222,30 L340,92" style="stroke:var(--accent)" stroke-width="3.5" fill="none"/>
+<path d="M200,124 C178,114 150,104 118,98 M200,124 C220,112 242,104 266,100" style="stroke:var(--accent)" stroke-width="4" fill="none" opacity=".8"/>
+</g>
 <path d="M20 90 C20 40 90 15 170 20 C250 25 300 50 310 95 C300 130 200 150 110 140 C60 135 20 120 20 90Z" fill="none" style="stroke:var(--ink)" stroke-width="2"/>
-<g font-family="IBM Plex Mono, monospace" font-size="15" style="fill:var(--ink)" text-anchor="middle"><text x="65" y="62">VII</text><text x="65" y="115">VI</text><text x="150" y="62">VIII</text><text x="150" y="115">V</text><text x="218" y="90">IV</text><text x="278" y="62">II</text><text x="278" y="115">III</text></g>
-<text x="9" y="165" class="svgm">Derecha del paciente</text><text x="215" y="165" class="svgm">Ligamento falciforme (entre III y IV)</text></svg>`;
-const SVG_CALOT=`<svg viewBox="0 0 330 200" role="img" aria-label="Triángulo hepatocístico"><rect x="0" y="0" width="330" height="40" style="fill:var(--surface)"/><path d="M0 40H330" style="stroke:var(--muted)"/><text x="10" y="25" class="svgt">Borde inferior del hígado</text>
-<path d="M70 70 C35 95 45 160 85 170 C125 175 135 120 115 85Z" style="fill:var(--surface);stroke:var(--ink)" stroke-width="2"/>
-<path d="M115 85 C135 95 160 112 196 128" style="stroke:var(--accent)" stroke-width="8" fill="none" stroke-linecap="round"/>
-<path d="M200 40 V180" style="stroke:var(--accent)" stroke-width="10" stroke-linecap="round"/><path d="M200 40 L170 25M200 40 L235 25" style="stroke:var(--accent)" stroke-width="7" stroke-linecap="round"/>
-<path d="M240 100 C200 80 150 70 100 95" style="stroke:var(--alert)" stroke-width="4" fill="none"/>
-<path d="M200 40 L115 85 L200 130" style="fill:var(--alert);fill-opacity:.06;stroke:var(--ink)" stroke-dasharray="5 4" stroke-width="1.5"/>
-<text x="212" y="160" class="svgt">Colédoco</text><text x="212" y="62" class="svgt">Hepático común</text><text x="122" y="118" class="svgt" transform="rotate(25 122 118)">Cístico</text><text x="215" y="98" class="svgt" style="fill:var(--alert)">Arteria cística</text><text x="22" y="190" class="svgt">Vesícula</text></svg>`;
+<path d="M206,212 L200,124" style="stroke:var(--accent)" stroke-width="9" stroke-linecap="round" fill="none"/>
+<path d="M232,26 L246,104 L262,178" style="stroke:var(--ink)" stroke-width="1.8" fill="none"/>
+<path d="M166,128 C156,140 153,165 169,176 C183,183 193,166 191,149 C190,139 183,129 176,126 Z" class="o-gb" stroke-width="2"/>
+<ellipse cx="218" cy="22" rx="15" ry="9" style="fill:var(--accent)"/>
+<g font-family="IBM Plex Mono, monospace" font-size="14" font-weight="500" style="fill:#3b1f10" text-anchor="middle">
+<text x="70" y="62">VII</text><text x="45" y="118">VI</text><text x="186" y="74">VIII</text><text x="135" y="122">V</text>
+<text x="222" y="70" font-size="11">IVa</text><text x="222" y="120" font-size="11">IVb</text><text x="262" y="66">II</text><text x="268" y="112">III</text></g>
+<text x="240" y="14" class="ig-b">VCI</text>
+<text x="8" y="14" class="ig-b">Venas hepáticas</text><line x1="70" y1="17" x2="150" y2="80" style="stroke:var(--muted)"/>
+<text x="26" y="84" class="ig-s">plano portal</text>
+<text x="214" y="214" class="ig-b">Vena porta</text>
+<text x="110" y="196" class="ig-t" style="fill:var(--bile)">Vesícula</text><line x1="140" y1="186" x2="166" y2="172" style="stroke:var(--muted)"/>
+<text x="268" y="186" class="ig-s">Lig. falciforme</text>
+</svg>`;
+/* Esquema propio de la vía biliar extrahepática y el triángulo hepatocístico, vista anterior (verificado con Netter, lámina 276) */
+const SVG_CALOT=`<svg viewBox="0 0 520 410" style="max-height:none" role="img" aria-label="Vía biliar extrahepática, triángulo hepatocístico, arteria hepática, vena porta y duodeno">
+<path d="M0,0 H520 V72 C450,92 380,90 320,98 C260,106 200,104 150,96 C100,88 45,92 0,104 Z" class="o-liver" stroke-width="1.5"/>
+<path d="M88,90 C108,84 126,86 146,93" style="stroke:#7a4128" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M150,334 C210,322 330,324 430,338 L430,392 C330,380 210,380 150,392 Z" class="o-duo" stroke-width="1.5"/>
+<path d="M300,380 C298,310 292,220 288,160 C286,130 289,112 292,100" style="stroke:var(--accent)" stroke-width="15" stroke-linecap="round" fill="none" opacity=".9"/>
+<path d="M150,96 L252,104 L250,190 L150,142 Z" style="fill:var(--alert);fill-opacity:.08;stroke:var(--ink)" stroke-dasharray="5 4" stroke-width="1.5"/>
+<path d="M410,300 C375,280 338,240 320,200 C310,175 305,150 302,128 M302,128 C307,114 316,106 332,100 M302,128 C280,128 240,122 206,109" style="stroke:var(--alert)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+<path d="M230,124 C212,134 186,140 160,149" style="stroke:var(--alert)" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M70,152 C40,192 55,282 105,302 C150,317 175,262 166,207 C161,177 152,157 142,147 C122,130 92,130 70,152 Z" class="o-gb" stroke-width="2"/>
+<path d="M196,100 C220,108 238,114 251,121 M318,100 C292,108 268,114 253,121 M252,120 L250,190 M150,142 C175,152 202,170 248,190" style="stroke:var(--bile)" stroke-width="7" fill="none" stroke-linecap="round"/>
+<path d="M250,190 C252,250 258,300 266,336" style="stroke:var(--bile)" stroke-width="8" fill="none" stroke-linecap="round"/>
+<circle cx="266" cy="338" r="5" style="fill:var(--bile)"/>
+<text x="16" y="30" class="ig-t">Hígado (cara inferior)</text>
+<text x="16" y="62" class="ig-s">Surco de Rouvière</text><line x1="108" y1="66" x2="116" y2="85" style="stroke:var(--muted)"/>
+<text x="300" y="40" class="ig-r">Triángulo hepatocístico</text><text x="300" y="56" class="ig-s">(de Calot)</text><line x1="304" y1="60" x2="212" y2="132" style="stroke:var(--muted)"/>
+<text x="150" y="84" class="ig-s">A. hepática derecha</text>
+<text x="16" y="124" class="ig-r">Arteria cística</text><line x1="112" y1="121" x2="186" y2="141" style="stroke:var(--muted)"/>
+<text x="185" y="232" class="ig-t" style="fill:var(--bile)">Cístico</text>
+<text x="345" y="150" class="ig-t" style="fill:var(--bile)">Conducto hepático común</text><line x1="342" y1="146" x2="256" y2="150" style="stroke:var(--muted)"/>
+<text x="345" y="196" class="ig-r">Arteria hepática propia</text><line x1="342" y1="192" x2="322" y2="200" style="stroke:var(--muted)"/>
+<text x="345" y="250" class="ig-t" style="fill:var(--bile)">Colédoco</text><line x1="342" y1="246" x2="257" y2="250" style="stroke:var(--muted)"/>
+<text x="345" y="290" class="ig-b">Vena porta</text><line x1="342" y1="286" x2="298" y2="286" style="stroke:var(--muted)"/>
+<text x="16" y="330" class="ig-t">Vesícula biliar</text>
+<text x="380" y="368" class="ig-t" text-anchor="middle">Duodeno</text><text x="266" y="372" class="ig-s" text-anchor="middle">papila</text>
+<rect x="16" y="396" width="16" height="6" rx="2" style="fill:var(--bile)"/><text x="38" y="403" class="ig-s">Vía biliar</text>
+<rect x="120" y="396" width="16" height="6" rx="2" style="fill:var(--alert)"/><text x="142" y="403" class="ig-s">Arterias</text>
+<rect x="220" y="396" width="16" height="6" rx="2" style="fill:var(--accent)"/><text x="242" y="403" class="ig-s">Venas</text>
+</svg>`;
+$('#heroArt').innerHTML=SVG_CALOT;
 /* Esquemas propios de la región inguinal derecha (verificados con Netter, láminas 242–245) */
 const SVG_INGUINAL_POST=`<svg viewBox="0 0 560 470" style="max-height:none" role="img" aria-label="Región inguinal derecha vista desde dentro del abdomen: triángulo de Hesselbach, anillo profundo, anillo femoral y triángulos del desastre y del dolor">
 <defs><pattern id="igHatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="9" height="9" style="fill:var(--alert-soft)"/><line x1="0" y1="0" x2="0" y2="9" style="stroke:var(--alert)" stroke-width="2" opacity=".35"/></pattern></defs>
@@ -513,6 +556,7 @@ const SVG_INGUINAL_POST=`<svg viewBox="0 0 560 470" style="max-height:none" role
 <path d="M320,236 Q230,170 115,70 L115,318 Z" style="fill:var(--accent-soft);stroke:var(--accent)" stroke-width="1.5" stroke-dasharray="6 4"/>
 <path d="M362,210 C330,240 290,300 250,430 L438,430 C418,330 396,262 370,212 Z" style="fill:var(--alert-soft)"/>
 <path d="M372,214 L530,150 L548,430 L446,430 C424,330 400,264 372,214 Z" style="fill:url(#igHatch)"/>
+<ellipse cx="68" cy="420" rx="50" ry="25" class="o-bl" stroke-width="1.5"/><text x="68" y="424" class="ig-s" text-anchor="middle">Vejiga</text>
 <rect x="20" y="40" width="95" height="285" rx="6" style="fill:var(--surface);stroke:var(--muted)" stroke-width="1.5"/>
 <text x="67" y="182" class="ig-s" text-anchor="middle" transform="rotate(-90 67 182)">Músculo recto del abdomen</text>
 <line x1="125" y1="345" x2="300" y2="295" style="stroke:var(--muted)" stroke-width="5" stroke-linecap="round" opacity=".7"/>
@@ -564,8 +608,8 @@ const SVG_TIROIDES=`<svg viewBox="0 0 560 525" style="max-height:none" role="img
 <path d="M392,500 C380,455 300,440 230,445 C170,450 120,462 95,500" style="stroke:var(--alert)" stroke-width="16" fill="none"/>
 <path d="M140,452 C130,380 124,300 124,14" style="stroke:var(--alert)" stroke-width="7" stroke-linecap="round" fill="none"/>
 <path d="M110,466 C80,450 50,445 8,448" style="stroke:var(--alert)" stroke-width="9" stroke-linecap="round" fill="none"/>
-<ellipse cx="220" cy="190" rx="44" ry="80" style="fill:var(--accent-soft);stroke:var(--accent)" stroke-width="1.5"/>
-<ellipse cx="340" cy="190" rx="44" ry="80" style="fill:var(--accent-soft);stroke:var(--accent)" stroke-width="1.5"/>
+<ellipse cx="220" cy="190" rx="44" ry="80" class="o-thy" stroke-width="1.5"/>
+<ellipse cx="340" cy="190" rx="44" ry="80" class="o-thy" stroke-width="1.5"/>
 <rect x="250" y="52" width="60" height="400" rx="20" style="fill:var(--surface);stroke:var(--muted)" stroke-width="1.5"/>
 <path d="M256,184H304M256,206H304M256,228H304M256,250H304M256,272H304M256,294H304M256,316H304M256,338H304M256,360H304M256,382H304M256,404H304M256,426H304" style="stroke:var(--line)" stroke-width="2"/>
 <rect x="234" y="104" width="16" height="30" style="fill:url(#thHatch)"/><rect x="310" y="104" width="16" height="30" style="fill:url(#thHatch)"/>
@@ -575,8 +619,8 @@ const SVG_TIROIDES=`<svg viewBox="0 0 560 525" style="max-height:none" role="img
 <path d="M470,14 C440,60 395,95 357,116" style="stroke:var(--alert)" stroke-width="4" fill="none"/>
 <path d="M90,14 C120,60 165,95 203,116" style="stroke:var(--alert)" stroke-width="4" fill="none"/>
 <path d="M462,14 C430,58 380,92 338,104" style="stroke:var(--ink)" stroke-width="1.5" stroke-dasharray="5 3" fill="none"/>
-<ellipse cx="204" cy="158" rx="9" ry="7" style="fill:var(--surface);stroke:var(--ink)" stroke-width="2"/><ellipse cx="356" cy="158" rx="9" ry="7" style="fill:var(--surface);stroke:var(--ink)" stroke-width="2"/>
-<ellipse cx="212" cy="246" rx="9" ry="7" style="fill:var(--surface);stroke:var(--ink)" stroke-width="2"/><ellipse cx="348" cy="246" rx="9" ry="7" style="fill:var(--surface);stroke:var(--ink)" stroke-width="2"/>
+<ellipse cx="204" cy="158" rx="9" ry="7" class="o-para" stroke-width="2"/><ellipse cx="356" cy="158" rx="9" ry="7" class="o-para" stroke-width="2"/>
+<ellipse cx="212" cy="246" rx="9" ry="7" class="o-para" stroke-width="2"/><ellipse cx="348" cy="246" rx="9" ry="7" class="o-para" stroke-width="2"/>
 <path d="M456,14 L456,505" style="stroke:var(--ink)" stroke-width="2.5" fill="none"/>
 <path d="M104,14 L104,505" style="stroke:var(--ink)" stroke-width="2.5" fill="none"/>
 <path d="M456,345 C460,368 470,380 452,380 C440,380 434,368 430,358 C410,330 380,300 360,280 L332,236 C326,200 320,140 318,96" style="stroke:var(--ink)" stroke-width="3.5" fill="none"/>
@@ -603,6 +647,9 @@ const SVG_TIROIDES=`<svg viewBox="0 0 560 525" style="max-height:none" role="img
 /* Esquema propio de la irrigación del colon en vista anterior (verificado con Netter, láminas 287 y 289) */
 const colonMark=(n,x,y)=>`<circle cx="${x}" cy="${y}" r="10" style="fill:var(--surface);stroke:var(--ink)" stroke-width="1.5"/><text x="${x}" y="${y+4}" text-anchor="middle" style="fill:var(--ink);font:600 11px var(--sans)">${n}</text>`;
 const SVG_COLON=`<svg viewBox="0 0 560 625" style="max-height:none" role="img" aria-label="Irrigación del colon: arterias mesentéricas superior e inferior, arco marginal, arco de Riolano y puntos de Griffiths y Sudeck">
+<path d="M30,60 C30,25 120,12 230,22 C255,25 262,45 250,62 C230,88 150,96 90,92 C55,90 30,80 30,60 Z" class="o-liver" stroke-width="1.5"/><text x="140" y="60" class="ig-s" text-anchor="middle">Hígado</text>
+<path d="M330,30 C380,18 425,38 424,68 C423,98 383,112 343,104 C322,100 312,80 318,60 C321,46 325,36 330,30 Z" class="o-st" stroke-width="1.5"/><text x="372" y="72" class="ig-s" text-anchor="middle">Estómago</text>
+<ellipse cx="522" cy="112" rx="26" ry="44" class="o-sp" stroke-width="1.5"/><text x="522" y="116" class="ig-s" text-anchor="middle">Bazo</text>
 <path d="M110,410 C95,400 92,380 95,350 L95,140 C95,105 120,100 150,108 C220,150 300,172 370,140" style="stroke:var(--accent)" stroke-width="26" stroke-linecap="round" fill="none" opacity=".28"/>
 <path d="M370,140 C395,128 410,110 420,95 C445,72 470,70 472,100 L472,320 C472,360 440,360 400,380 C350,405 330,420 315,445 L310,495" style="stroke:var(--alert)" stroke-width="26" stroke-linecap="round" fill="none" opacity=".24"/>
 <path d="M285,28 L285,392" style="stroke:var(--alert)" stroke-width="10" stroke-linecap="round" fill="none"/>
@@ -628,7 +675,7 @@ ${colonMark(1,285,62)}${colonMark(2,240,300)}${colonMark(3,214,160)}${colonMark(
 <text x="290" y="566">6 A. mesentérica inferior (L3)</text><text x="290" y="582">7 Cólica izquierda · 8 Sigmoideas</text><text x="290" y="598">9 Rectal superior</text><text x="290" y="614">10 Arco marginal · 11 Arco de Riolano</text></g>
 </svg>`;
 const ANAT=[
-{t:'Triángulo hepatocístico (de Calot) y vía biliar',tag:'Colecistectomía',svg:SVG_CALOT,cap:'Esquema: el triángulo se limita por el conducto cístico, el hepático común y el borde inferior del hígado.{{strasberg,moore,netter@276}}',html:`
+{t:'Triángulo hepatocístico (de Calot) y vía biliar',tag:'Colecistectomía',svg:SVG_CALOT,cap:'Esquema propio en vista anterior: vía biliar en verde, arterias en rojo y vena porta en azul. El triángulo hepatocístico se limita por el conducto cístico, el hepático común y el borde inferior del hígado, y contiene la arteria cística; la arteria hepática derecha suele pasar por detrás del hepático común.{{strasberg,moore,netter@276}}',html:`
 <ul class="tight"><li><b>Contenido:</b> arteria cística (rama de la hepática derecha), ganglio de Lund, tejido linfograso.{{moore,sabiston,netter@276}}</li>
 <li><b>Variantes frecuentes:</b> arteria hepática derecha aberrante o reemplazada desde la mesentérica superior, que discurre posterior al conducto cístico; arteria cística doble; conductos hepáticos derechos accesorios que desembocan en el cístico.{{moore,sabiston,netter@277,netter@288}}</li>
 <li><b>Referencias de seguridad:</b> surco de Rouvière (la disección se mantiene por encima de él){{sabiston}} y visión crítica de seguridad.{{strasberg}}</li>
@@ -649,7 +696,7 @@ const ANAT=[
 <li><b>Rama externa del laríngeo superior:</b> inerva el cricotiroideo; se lesiona al ligar el polo superior lejos de la glándula (pérdida de tono agudo).{{moore,sabiston,netter@69}}</li>
 <li><b>Paratiroides:</b> habitualmente 4; las inferiores se irrigan de la tiroidea inferior. Ligar las ramas sobre la cápsula tiroidea y autotrasplantar glándulas desvascularizadas.{{sabiston,netter@70}}</li></ul>
 <div class="risk"><b>Hematoma cervical postoperatorio:</b> urgencia vital. Abrir la herida en cabecera si hay compromiso respiratorio.{{sabiston}}</div>`},
-{t:'Segmentación hepática de Couinaud',tag:'Resecciones hepáticas',svg:SVG_COUINAUD,cap:'Vista anterior: segmentos I (caudado, no visible) a VIII.{{couinaud,netter@272}}',html:`
+{t:'Segmentación hepática de Couinaud',tag:'Resecciones hepáticas',svg:SVG_COUINAUD,cap:'Esquema propio en vista anterior. Las venas hepáticas (azul) separan los sectores y desembocan en la vena cava inferior; el plano portal separa los segmentos superiores de los inferiores, y el ligamento falciforme separa el segmento IV de los segmentos II y III. El segmento I (caudado) no se ve desde delante.{{couinaud,netter@272,netter@273,moore}}',html:`
 <ul class="tight"><li>El hígado se divide en 8 segmentos funcionales, cada uno con pedículo portal (rama portal, arterial y biliar) y drenaje venoso propios.{{couinaud,moore,netter@272}}</li>
 <li><b>Plano principal (de Cantlie):</b> vena hepática media, desde la fosa vesicular hasta la vena cava; separa el hígado derecho del izquierdo.{{moore,sabiston}}</li>
 <li><b>Venas hepáticas</b> (derecha, media, izquierda) corren entre segmentos; el pedículo portal corre en su centro.{{moore,netter@273}}</li>
