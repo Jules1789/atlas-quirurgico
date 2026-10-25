@@ -291,6 +291,8 @@ caption{caption-side:bottom;text-align:left;font-size:.75rem;color:var(--muted);
 <section id="s-calculadoras" hidden>
   <div class="kicker">Módulo 6</div><h2>Calculadoras clínicas</h2>
   <p class="lead">Los valores iniciales son ejemplos; reemplácelos con los datos de su paciente.</p>
+  <div class="toolbar"><input type="search" id="calcSearch" placeholder="Buscar calculadora: pancreatitis, renal, quemaduras…" aria-label="Buscar calculadora" style="flex:1;min-width:200px"></div>
+  <p class="lead" id="calcEmpty" hidden>No hay calculadoras que coincidan con la búsqueda.</p>
   <div class="grid" id="calcGrid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr))"></div>
 </section>
 
@@ -349,6 +351,11 @@ const REFS={
  rotondo:{v:'Rotondo MF, Schwab CW, McGonigal MD, Phillips GR, Fruchterman TM, Kauder DR, et al. "Damage control": an approach for improved survival in exsanguinating penetrating abdominal injury. J Trauma. 1993;35(3):375-82.',p:'8371295'},
  mitchell:{v:'Mitchell RB, Hussey HM, Setzen G, Jacobs IN, Nussenbaum B, Dawson C, et al. Clinical consensus statement: tracheostomy care. Otolaryngol Head Neck Surg. 2013;148(1):6-20.',p:'22990518',d:'10.1177/0194599812460376'},
  deerenberg:{v:'Deerenberg EB, Harlaar JJ, Steyerberg EW, Lont HE, van Doorn HC, Heisterkamp J, et al. Small bites versus large bites for closure of abdominal midline incisions (STITCH): a double-blind, multicentre, randomised controlled trial. Lancet. 2015;386(10000):1254-60.',p:'26188742',d:'10.1016/S0140-6736(15)60459-7'},
+ ranson74:{v:'Ranson JH, Rifkind KM, Roses DF, Fink SD, Eng K, Spencer FC. Prognostic signs and the role of operative management in acute pancreatitis. Surg Gynecol Obstet. 1974;139(1):69-81.',p:'4834279'},
+ ranson82:{v:'Ranson JH. Etiological and prognostic factors in human acute pancreatitis: a review. Am J Gastroenterol. 1982;77(9):633-8.',p:'7051819'},
+ wu:{v:'Wu BU, Johannes RS, Sun X, Tabak Y, Conwell DL, Banks PA. The early prediction of mortality in acute pancreatitis: a large population-based study. Gut. 2008;57(12):1698-703.',p:'18519429',d:'10.1136/gut.2008.152702'},
+ knaus:{v:'Knaus WA, Draper EA, Wagner DP, Zimmerman JE. APACHE II: a severity of disease classification system. Crit Care Med. 1985;13(10):818-29.',p:'3928249'},
+ banks:{v:'Banks PA, Bollen TL, Dervenis C, Gooszen HG, Johnson CD, Sarr MG, et al. Classification of acute pancreatitis--2012: revision of the Atlanta classification and definitions by international consensus. Gut. 2013;62(1):102-11.',p:'23100216',d:'10.1136/gutjnl-2012-302779'},
  martyn:{v:'Martyn JA, Richtsfeld M. Succinylcholine-induced hyperkalemia in acquired pathologic states: etiologic factors and molecular mechanisms. Anesthesiology. 2006;104(1):158-69.',p:'16394702',d:'10.1097/00000542-200601000-00022'}
 };
 /* Reemplaza {{clave,clave@lámina}} por [n] numerados por orden de aparición; devuelve [html, lista].
@@ -410,7 +417,7 @@ $('#homeCards').innerHTML=[
  ['farmacologia','Farmacología','Anestésicos, relajantes, analgesia, profilaxis antibiótica, anticoagulación y vasopresores.'],
  ['tecnicas','Técnicas quirúrgicas','Colecistectomía, apendicectomía, Lichtenstein, tiroidectomía, anastomosis, gastrectomía, hemicolectomía, laparotomía en trauma, traqueostomía y suturas.'],
  ['modelos3d','Modelos 3D','Corazón con coronarias y abdomen superior con vasos, vía biliar y órganos.'],
- ['calculadoras','Calculadoras','Cockcroft-Gault, Parkland, Child-Pugh, Glasgow, dosis máxima de anestésico local y más.']
+ ['calculadoras','Calculadoras','Ranson, BISAP, APACHE II, Child-Pugh, Glasgow, Parkland, Cockcroft-Gault y más, con buscador.']
 ].map(([id,t,d])=>`<a class="card home-card ${COL[id]}" href="#${id}"><span class="ico-tile">${ico(id,24)}</span><h3>${t}</h3><p>${d}</p><span class="go">Abrir →</span></a>`).join('');
 $('#heroArt').innerHTML=`<svg viewBox="0 0 400 300" style="width:100%;height:100%" role="img" aria-label="Esquema del triángulo hepatocístico">
 <path d="M0 70 C80 40 200 30 400 60 L400 0 L0 0Z" style="fill:var(--soft);stroke:var(--muted)" stroke-width="1"/>
@@ -785,10 +792,49 @@ const CALCS=[
   return [`Calcio corregido <b>${cc.toFixed(1)}</b> mg/dL (Ca + 0.8 × [4 − albúmina], fórmula de uso clínico; la original de Payne usa factor 1)`,`Brecha aniónica <b>${ag.toFixed(0)}</b> · corregida por albúmina <b>${agc.toFixed(0)}</b> (normal 8–12)`,agc>12?'Acidosis con brecha elevada: lactato, cetonas, uremia, tóxicos.':'Sin brecha elevada.']}},
 {t:'Pérdida sanguínea permisible y PAM',f:[['w','Peso (kg)',70],['s','Sexo',['m','Hombre','f','Mujer']],['hi','Hto inicial (%)',42],['hf','Hto mínimo aceptable (%)',27],['ps','PA sistólica',120],['pd','PA diastólica',70]],
  run:v=>{const ebv=v.w*(v.s==='m'?70:65);const abl=ebv*Math.log(v.hi/v.hf);const pam=(+v.ps+2*v.pd)/3;
-  return [`Volemia estimada <b>${ebv.toFixed(0)}</b> mL`,`Pérdida permisible, fórmula de Gross: volemia × ln(Hto inicial / Hto mínimo) = <b>${abl.toFixed(0)}</b> mL (${(abl/ebv*100).toFixed(0)} % de la volemia)`,`PAM <b>${pam.toFixed(0)}</b> mmHg · presión de pulso ${v.ps-v.pd}`]}}
+  return [`Volemia estimada <b>${ebv.toFixed(0)}</b> mL`,`Pérdida permisible, fórmula de Gross: volemia × ln(Hto inicial / Hto mínimo) = <b>${abl.toFixed(0)}</b> mL (${(abl/ebv*100).toFixed(0)} % de la volemia)`,`PAM <b>${pam.toFixed(0)}</b> mmHg · presión de pulso ${v.ps-v.pd}`]}},
+{t:'Pancreatitis aguda: criterios de Ranson',f:[['et','Etiología',['nb','No biliar (alcohol, otras)','b','Biliar']],['a','Edad (años)',60],['wbc','Leucocitos (/mm³)',17000],['glu','Glucosa (mg/dL)',220],['ldh','LDH (UI/L)',400],['ast','AST (UI/L)',260],
+  ['hto','A las 48 h: descenso del Hto (puntos)',8],['bun','A las 48 h: aumento del BUN (mg/dL)',3],['ca','A las 48 h: calcio (mg/dL)',7.8],['pao2','A las 48 h: PaO₂ (mmHg)',65],['bd','A las 48 h: déficit de base (mEq/L)',3],['liq','A las 48 h: secuestro de líquidos (L)',5]],
+ run:v=>{const b=v.et==='b';
+  const ing=[[v.a>(b?70:55),`edad >${b?70:55}`],[v.wbc>(b?18000:16000),`leucocitos >${b?'18 000':'16 000'}`],[v.glu>(b?220:200),`glucosa >${b?220:200}`],[v.ldh>(b?400:350),`LDH >${b?400:350}`],[v.ast>250,'AST >250']];
+  const h48=[[v.hto>10,'descenso de Hto >10'],[v.bun>(b?2:5),`aumento de BUN >${b?2:5}`],[v.ca<8,'calcio <8'],...(b?[]:[[v.pao2<60,'PaO₂ <60']]),[v.bd>(b?5:4),`déficit de base >${b?5:4}`],[v.liq>(b?4:6),`secuestro de líquidos >${b?4:6} L`]];
+  const n1=ing.filter(x=>x[0]).length,n2=h48.filter(x=>x[0]).length,tot=n1+n2,pos=[...ing,...h48].filter(x=>x[0]).map(x=>x[1]);
+  return [`Ranson <b>${tot}</b> (ingreso ${n1}/5 · 48 h ${n2}/${h48.length})`,pos.length?`Criterios presentes: ${pos.join(', ')}.`:'Ningún criterio presente.',
+   tot>=3?'<b>≥ 3 criterios: pancreatitis grave según Ranson.</b>':'Menos de 3 criterios: pancreatitis leve según Ranson.',
+   'La clasificación de Atlanta 2012 define la pancreatitis grave por falla orgánica persistente (>48 h).']}},
+{t:'Pancreatitis aguda: BISAP',f:[['bun','BUN (mg/dL)',30],['mental','Alteración del estado mental',['0','No','1','Sí (desorientación, letargo, estupor, coma)']],['sirs','SIRS (≥ 2 criterios)',['0','No','1','Sí']],['a','Edad (años)',65],['der','Derrame pleural',['0','No','1','Sí']]],
+ run:v=>{const s=(v.bun>25?1:0)+ +v.mental+ +v.sirs+(v.a>60?1:0)+ +v.der;
+  return [`BISAP <b>${s}</b>/5 (evaluar en las primeras 24 h)`,'Un punto por cada uno: BUN >25 mg/dL, alteración mental, SIRS, edad >60 años y derrame pleural.',
+   'En la cohorte de derivación, la mortalidad hospitalaria fue <1 % en el grupo de menor riesgo y >20 % en el de mayor riesgo.',
+   'SIRS: ≥ 2 de temperatura >38 o <36 °C, FC >90, FR >20 o PaCO₂ <32 mmHg, leucocitos >12 000 o <4 000/mm³.']}},
+{t:'APACHE II',f:[['t','Temperatura (°C)',38.7],['pam','Presión arterial media (mmHg)',65],['fc','Frecuencia cardiaca (lpm)',118],['fr','Frecuencia respiratoria (rpm)',26],['fio2','FiO₂ (%)',40],['pao2','PaO₂ (mmHg)',72],['paco2','PaCO₂ (mmHg)',32],['ph','pH arterial',7.31],['na','Na⁺ (mEq/L)',134],['k','K⁺ (mEq/L)',3.9],['cr','Creatinina (mg/dL)',1.6],['ira','Insuficiencia renal aguda',['0','No','1','Sí (puntos de creatinina × 2)']],['hct','Hematocrito (%)',38],['wbc','Leucocitos (× 1000/mm³)',16],['gcs','Glasgow (3–15)',14],['a','Edad (años)',62],['cr2','Enfermedad crónica grave o inmunosupresión',['0','No','2','Sí, posoperatorio electivo','5','Sí, no quirúrgico o posoperatorio de urgencia']]],
+ run:v=>{const P=[];
+  const add=(name,p)=>{P.push([name,p]);return p};
+  const t=v.t;add('Temperatura',t>=41?4:t>=39?3:t>=38.5?1:t>=36?0:t>=34?1:t>=32?2:t>=30?3:4);
+  const m=v.pam;add('PAM',m>=160?4:m>=130?3:m>=110?2:m>=70?0:m>=50?2:4);
+  const fc=v.fc;add('FC',fc>=180?4:fc>=140?3:fc>=110?2:fc>=70?0:fc>=55?2:fc>=40?3:4);
+  const fr=v.fr;add('FR',fr>=50?4:fr>=35?3:fr>=25?1:fr>=12?0:fr>=10?1:fr>=6?2:4);
+  let oxTxt;
+  if(v.fio2>=50){const aa=v.fio2/100*713-v.paco2/0.8-v.pao2;oxTxt=`A-aDO₂ ${aa.toFixed(0)} mmHg`;add('Oxigenación',aa>=500?4:aa>=350?3:aa>=200?2:0)}
+  else{const p=v.pao2;oxTxt=`PaO₂ ${p} mmHg`;add('Oxigenación',p>70?0:p>=61?1:p>=55?3:4)}
+  const ph=v.ph;add('pH',ph>=7.7?4:ph>=7.6?3:ph>=7.5?1:ph>=7.33?0:ph>=7.25?2:ph>=7.15?3:4);
+  const na=v.na;add('Na⁺',na>=180?4:na>=160?3:na>=155?2:na>=150?1:na>=130?0:na>=120?2:na>=111?3:4);
+  const k=v.k;add('K⁺',k>=7?4:k>=6?3:k>=5.5?1:k>=3.5?0:k>=3?1:k>=2.5?2:4);
+  const cr=v.cr;add('Creatinina',(cr>=3.5?4:cr>=2?3:cr>=1.5?2:cr>=0.6?0:2)*(v.ira==='1'?2:1));
+  const h=v.hct;add('Hematocrito',h>=60?4:h>=50?2:h>=46?1:h>=30?0:h>=20?2:4);
+  const w=v.wbc;add('Leucocitos',w>=40?4:w>=20?2:w>=15?1:w>=3?0:w>=1?2:4);
+  add('Glasgow',15-Math.min(15,Math.max(3,Math.round(v.gcs))));
+  const aps=P.reduce((s,x)=>s+x[1],0);
+  const a=v.a,ap=a>=75?6:a>=65?5:a>=55?3:a>=45?2:0,cp=+v.cr2,tot=aps+ap+cp;
+  return [`APACHE II <b>${tot}</b> (fisiología aguda ${aps} · edad ${ap} · salud crónica ${cp})`,
+   `Puntos por variable: ${P.filter(x=>x[1]).map(x=>x[0]+' '+x[1]).join(', ')||'ninguna alterada'}. Oxigenación evaluada con ${oxTxt}${v.fio2>=50?' (FiO₂ ≥ 50 %)':' (FiO₂ < 50 %)'}.`,
+   'Usar el peor valor de las primeras 24 h en UCI. Rango 0–71; la mortalidad aumenta con el puntaje, y su estimación exacta requiere la categoría diagnóstica del artículo original.']}}
 ];
-const CREF=['mosteller,devine','cockcroft','holliday,miller','baxter,atls','pugh,mansour','teasdale,atls','miller,gg,neal','payne,figge','gross,miller'];
-$('#calcGrid').innerHTML=CALCS.map((c,i)=>{const [ct,cl]=cite(`${c.t}{{${CREF[i]}}}`);return `<div class="card calc" data-i="${i}"><h3>${ct}</h3><div class="fields">${c.f.map(([k,l,x],j)=>{
+const CREF=['mosteller,devine','cockcroft','holliday,miller','baxter,atls','pugh,mansour','teasdale,atls','miller,gg,neal','payne,figge','gross,miller','ranson74,ranson82,banks','wu,banks','knaus'];
+/* palabras clave extra para el buscador (mismo orden que CALCS) */
+const CKW=['imc peso talla superficie corporal obesidad devine mosteller','renal riñón creatinina depuración filtrado','líquidos sueros ayuno pediatría holliday','quemaduras líquidos reanimación','cirrosis hígado hepatopatía riesgo quirúrgico','neurológico trauma coma conciencia tce','anestesia local lidocaína bupivacaína ropivacaína toxicidad last','electrolitos calcio albúmina acidosis anion gap','sangrado hemorragia transfusión hematocrito presión arterial media',
+ 'páncreas pancreatitis gravedad pronóstico biliar alcohol','páncreas pancreatitis bisap mortalidad pronóstico','uci terapia intensiva gravedad mortalidad sepsis pronóstico apache'];
+$('#calcGrid').innerHTML=CALCS.map((c,i)=>{const [ct,cl]=cite(`${c.t}{{${CREF[i]}}}`);return `<div class="card calc" data-i="${i}" data-k="${CKW[i]||''}"><h3>${ct}</h3><div class="fields">${c.f.map(([k,l,x],j)=>{
   const id=`c${i}_${k}`;
   if(Array.isArray(x)){const o=[];for(let n=0;n<x.length;n+=2)o.push([x[n],x[n+1]]);return `<label>${l}<select id="${id}" data-k="${k}">${sel(o)}</select></label>`}
   return `<label>${l}<input id="${id}" data-k="${k}" type="number" step="any" value="${x}" inputmode="decimal"></label>`}).join('')}</div><div class="res" id="r${i}"></div>${cl}</div>`}).join('');
@@ -800,6 +846,16 @@ function runCalc(i){
 }
 CALCS.forEach((_,i)=>runCalc(i));
 $('#calcGrid').addEventListener('input',e=>{const card=e.target.closest('[data-i]');if(card)runCalc(+card.dataset.i)});
+/* Buscador: compara sin acentos y por inicio de palabra contra título, campos y palabras clave */
+const plain=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+$('#calcSearch').addEventListener('input',e=>{
+  const words=plain(e.target.value).split(/\s+/).filter(Boolean);let shown=0;
+  document.querySelectorAll('#calcGrid .calc').forEach(card=>{
+    const hay=plain(card.querySelector('h3').textContent+' '+[...card.querySelectorAll('label')].map(l=>l.firstChild.textContent).join(' ')+' '+card.dataset.k);
+    const terms=hay.split(/[^a-z0-9]+/);
+    const ok=words.every(w=>terms.some(t=>t.startsWith(w)));card.hidden=!ok;if(ok)shown++});
+  $('#calcEmpty').hidden=shown>0;
+});
 
 /* ---------- repaso ---------- */
 const QZ=[
