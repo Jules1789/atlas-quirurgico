@@ -169,8 +169,8 @@ h3.with-save{display:flex;align-items:center;justify-content:space-between;gap:.
 .save-n{font:500 .75rem var(--mono);color:var(--muted)}
 .lists-wrap{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr))}
 .list-head{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
-.list-head h3{margin:0;flex:1;min-width:0}
-.list-actions{display:flex;gap:.35rem}
+.list-head h3{margin:0;flex:1 1 100%;min-width:0;overflow-wrap:anywhere}
+.list-actions{display:flex;gap:.35rem;margin-left:auto}
 .btn.sm{padding:.3rem .65rem;font-size:.8rem}
 .btn.danger{background:var(--alert);color:var(--bg)}
 .list-confirm{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;background:var(--alert-soft);border-radius:6px;padding:.6rem .8rem;margin-top:.6rem;font-size:.88rem}
@@ -180,6 +180,11 @@ h3.with-save{display:flex;align-items:center;justify-content:space-between;gap:.
 .link-btn:hover{text-decoration:underline}
 .icon-x{background:none;border:0;color:var(--muted);font-size:1.2rem;cursor:pointer;padding:0 .4rem;line-height:1}
 .icon-x:hover{color:var(--alert)}
+.xfer{margin-bottom:1rem}
+.xfer textarea{width:100%;font:12px/1.4 var(--mono);background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:.6rem;resize:vertical;word-break:break-all}
+.xfer-msg{font-size:.88rem;color:var(--accent);min-height:1.2em;margin:.3rem 0 0}
+.xfer-msg.err{color:var(--alert)}
+.file-btn{display:inline-flex;align-items:center;cursor:pointer}
 @keyframes flashIt{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 3px transparent}}
 .flash{animation:flashIt 1.8s ease-out}
 @media(prefers-reduced-motion:reduce){.flash{animation:none;outline:2px solid var(--accent)}}
@@ -340,6 +345,26 @@ caption{caption-side:bottom;text-align:left;font-size:.75rem;color:var(--muted);
   <div class="kicker">Módulo 8</div><h2>Mis listas</h2>
   <p class="lead">Guarde temas, técnicas, fármacos, calculadoras y estructuras 3D con el ícono de marcador para repasarlos después. Las listas se guardan solo en este dispositivo.</p>
   <div class="toolbar"><input id="newListName" placeholder="Nombre de la nueva lista (p. ej., Guardia, Examen)" aria-label="Nombre de la nueva lista" style="flex:1;min-width:200px"><button class="btn" type="button" id="newListBtn">Crear lista</button></div>
+  <div class="toolbar"><button class="btn ghost" type="button" id="expBtn" aria-expanded="false">Exportar listas</button><button class="btn ghost" type="button" id="impBtn" aria-expanded="false">Importar listas</button></div>
+  <div class="card xfer" id="expPanel" hidden>
+    <h3>Exportar listas</h3>
+    <p class="save-item">Copie el código y envíelo (por ejemplo, por WhatsApp o correo), o descargue el archivo. En el otro dispositivo abra Mis listas → Importar listas.</p>
+    <textarea id="expCode" rows="4" readonly aria-label="Código de exportación"></textarea>
+    <div class="toolbar"><button class="btn" type="button" id="expCopy">Copiar código</button><button class="btn ghost" type="button" id="expFile">Descargar archivo</button><button class="btn ghost" type="button" id="expShare" hidden>Compartir…</button></div>
+    <p class="xfer-msg" id="expMsg" role="status"></p>
+  </div>
+  <div class="card xfer" id="impPanel" hidden>
+    <h3>Importar listas</h3>
+    <p class="save-item">Pegue el código recibido o elija el archivo exportado desde otro dispositivo.</p>
+    <textarea id="impCode" rows="4" placeholder="Pegue aquí el código (empieza con AQ1:)" aria-label="Código para importar"></textarea>
+    <div class="toolbar">
+      <label class="btn ghost file-btn">Elegir archivo<input type="file" id="impFile" accept=".json,.txt,application/json,text/plain" hidden></label>
+      <select id="impMode" aria-label="Cómo importar"><option value="merge">Combinar con mis listas</option><option value="replace">Reemplazar mis listas</option></select>
+      <button class="btn" type="button" id="impGo">Importar</button>
+    </div>
+    <div class="list-confirm" id="impConfirm" hidden><span>Se borrarán sus listas actuales y se reemplazarán por las importadas.</span><button class="btn sm danger" type="button" id="impYes">Sí, reemplazar</button><button class="btn ghost sm" type="button" id="impNo">Cancelar</button></div>
+    <p class="xfer-msg" id="impMsg" role="status"></p>
+  </div>
   <div id="listsWrap" class="lists-wrap"></div>
 </section>
 
@@ -1180,6 +1205,62 @@ function openItem(k){
   setTimeout(()=>{el.scrollIntoView({block:'start'});window.scrollBy(0,-72);el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')},30);
 }
 renderLists();
+
+/* ---------- exportar e importar listas ---------- */
+/* Código: "AQ1:" + JSON en base64 (variante para URL). El archivo es el mismo JSON legible. */
+const listsData=()=>({v:1,app:'atlas-quirurgico',lists:LISTS.lists.map(l=>({name:l.name,items:l.items.map(({k,t})=>({k,t}))}))});
+function encodeLists(){const bytes=new TextEncoder().encode(JSON.stringify(listsData()));let bin='';bytes.forEach(b=>bin+=String.fromCharCode(b));
+  return 'AQ1:'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function decodeLists(text){
+  text=text.trim();let json=text;
+  if(!text.startsWith('{')){const s=text.replace(/^AQ1:/i,'').replace(/\s+/g,'').replace(/-/g,'+').replace(/_/g,'/');
+    const bin=atob(s+'='.repeat((4-s.length%4)%4));json=new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0)))}
+  const d=JSON.parse(json);if(!d||!Array.isArray(d.lists))throw new Error('formato');
+  return d.lists.filter(l=>l&&typeof l.name==='string').map(l=>({name:l.name.trim().slice(0,80)||'Lista importada',
+    items:(Array.isArray(l.items)?l.items:[]).filter(it=>it&&typeof it.t==='string'&&/^(anat|fis|farm|tec|calc|m3d):[a-z0-9:-]{1,120}$/.test(it.k)).map(it=>({k:it.k,t:it.t.slice(0,200)}))}));
+}
+function applyImport(lists,mode){let nl=0,ni=0;
+  if(mode==='replace')LISTS.lists=[];
+  lists.forEach(src=>{let dst=LISTS.lists.find(l=>fold(l.name)===fold(src.name));
+    if(!dst){dst={id:'l'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:src.name,items:[]};LISTS.lists.push(dst);nl++}
+    src.items.forEach(it=>{if(!dst.items.some(x=>x.k===it.k)){dst.items.push(it);ni++}})});
+  saveLists();refreshSaveBtns();renderLists();return {nl,ni}}
+const msg=(id,text,err)=>{const m=$('#'+id);m.textContent=text;m.classList.toggle('err',!!err)};
+const plural=(n,a,b)=>`${n} ${n===1?a:b}`;
+function togglePanel(show,hide){$('#'+hide+'Panel').hidden=true;$('#'+hide+'Btn').setAttribute('aria-expanded','false');
+  const p=$('#'+show+'Panel'),open=p.hidden;p.hidden=!open;$('#'+show+'Btn').setAttribute('aria-expanded',open);return open}
+$('#expBtn').addEventListener('click',()=>{if(!togglePanel('exp','imp'))return;
+  $('#expCode').value=encodeLists();$('#expShare').hidden=!navigator.share;
+  const n=LISTS.lists.reduce((s,l)=>s+l.items.length,0);
+  msg('expMsg',n?`Incluye ${plural(LISTS.lists.length,'lista','listas')} con ${plural(n,'elemento','elementos')}.`:'Sus listas están vacías; guarde algo antes de exportar.',!n)});
+$('#impBtn').addEventListener('click',()=>{if(togglePanel('imp','exp')){msg('impMsg','');$('#impConfirm').hidden=true}});
+$('#expCopy').addEventListener('click',()=>{const code=$('#expCode').value;
+  const fallback=()=>{const t=$('#expCode');t.focus();t.select();msg('expMsg','No se pudo copiar automáticamente. El código quedó seleccionado: cópielo manualmente.',true)};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(code).then(()=>msg('expMsg','Código copiado. Péguelo en el otro dispositivo, en Importar listas.')).catch(fallback);else fallback()});
+const expFileObj=()=>new File([JSON.stringify(listsData(),null,2)],`atlas-quirurgico-listas-${new Date().toISOString().slice(0,10)}.json`,{type:'application/json'});
+$('#expFile').addEventListener('click',()=>{const f=expFileObj(),url=URL.createObjectURL(f),a=document.createElement('a');
+  a.href=url;a.download=f.name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
+  msg('expMsg',`Archivo descargado: ${f.name}`)});
+$('#expShare').addEventListener('click',async()=>{const f=expFileObj();
+  try{if(navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f],title:'Listas de Atlas Quirúrgico'});
+    else await navigator.share({title:'Listas de Atlas Quirúrgico',text:$('#expCode').value});msg('expMsg','Listas compartidas.')}
+  catch(e){if(e&&e.name!=='AbortError')msg('expMsg','No se pudo compartir. Use Copiar código o Descargar archivo.',true)}});
+$('#impFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;
+  try{$('#impCode').value=await f.text();msg('impMsg',`Archivo cargado: ${f.name}. Toque Importar.`)}catch(err){msg('impMsg','No se pudo leer el archivo.',true)}
+  e.target.value=''});
+let pendingImport=null;
+function runImport(lists,mode){const r=applyImport(lists,mode);pendingImport=null;$('#impConfirm').hidden=true;$('#impCode').value='';
+  msg('impMsg',mode==='replace'?`Listo: se importaron ${plural(lists.length,'lista','listas')} con ${plural(r.ni,'elemento','elementos')}.`
+    :(r.nl||r.ni)?`Listo: ${plural(r.nl,'lista nueva','listas nuevas')} y ${plural(r.ni,'elemento agregado','elementos agregados')}.`:'No había nada nuevo: ya tenía todo lo que contiene el código.')}
+$('#impGo').addEventListener('click',()=>{const txt=$('#impCode').value;
+  if(!txt.trim())return msg('impMsg','Pegue un código o elija un archivo primero.',true);
+  let lists;try{lists=decodeLists(txt)}catch(e){return msg('impMsg','El código o archivo no es válido. Verifique que lo copió completo, desde «AQ1:» hasta el final.',true)}
+  if(!lists.length)return msg('impMsg','El código no contiene listas.',true);
+  const mode=$('#impMode').value;
+  if(mode==='replace'){pendingImport=lists;$('#impConfirm').hidden=false;msg('impMsg','');return}
+  runImport(lists,'merge')});
+$('#impYes').addEventListener('click',()=>{if(pendingImport)runImport(pendingImport,'replace')});
+$('#impNo').addEventListener('click',()=>{pendingImport=null;$('#impConfirm').hidden=true;msg('impMsg','Importación cancelada.')});
 /* Ampliar esquemas: tocar el dibujo lo abre a pantalla completa; tocar de nuevo, Cerrar o Esc lo cierra */
 const figClose=document.createElement('button');figClose.className='btn fig-close';figClose.type='button';figClose.textContent='Cerrar';figClose.hidden=true;document.body.append(figClose);
 function closeFig(){const z=document.querySelector('figure.fig-zoom');if(z)z.classList.remove('fig-zoom');figClose.hidden=true;document.body.style.overflow=''}
