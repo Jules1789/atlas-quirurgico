@@ -1,6 +1,6 @@
 /* Service worker de Atlas Quirúrgico: guarda la app para usarla sin conexión.
    Al publicar cambios, subir el número de VERSION para que los teléfonos descarguen la nueva versión. */
-const VERSION = 'v6';
+const VERSION = 'v7';
 const CACHE = 'atlas-qx-' + VERSION;
 const LOCAL = [
   './',

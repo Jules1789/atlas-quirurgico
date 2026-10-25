@@ -151,6 +151,38 @@ a.home-card:hover{border-color:var(--accent)} a.home-card.red:hover{border-color
   .top-in{justify-content:center}
   body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
 }
+/* guardar en listas */
+.save-btn{background:none;border:0;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:inline-grid;place-items:center;flex:none;line-height:0}
+.save-btn:hover{color:var(--ink);background:var(--soft)}
+.save-btn[aria-pressed="true"]{color:var(--accent)} .save-btn[aria-pressed="true"] path{fill:currentColor}
+.sum-r{display:flex;align-items:center;gap:.4rem;flex:none}
+.name-cell{display:inline-flex;align-items:center;gap:.25rem}
+.calc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem}
+h3.with-save{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.save-dlg{border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);width:min(420px,calc(100vw - 32px));padding:1.1rem 1.2rem}
+.save-dlg::backdrop{background:rgba(0,0,0,.45)}
+.save-item{color:var(--muted);margin:.2rem 0 .8rem;font-size:.9rem}
+.save-lists{display:flex;flex-direction:column;gap:.35rem;max-height:40vh;overflow:auto}
+.save-row{display:flex;align-items:center;gap:.6rem;padding:.45rem .6rem;border:1px solid var(--line);border-radius:6px;cursor:pointer}
+.save-row input{accent-color:var(--accent);width:18px;height:18px}
+.save-row span:nth-child(2){flex:1;min-width:0}
+.save-n{font:500 .75rem var(--mono);color:var(--muted)}
+.lists-wrap{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr))}
+.list-head{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.list-head h3{margin:0;flex:1;min-width:0}
+.list-actions{display:flex;gap:.35rem}
+.btn.sm{padding:.3rem .65rem;font-size:.8rem}
+.btn.danger{background:var(--alert);color:var(--bg)}
+.list-confirm{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;background:var(--alert-soft);border-radius:6px;padding:.6rem .8rem;margin-top:.6rem;font-size:.88rem}
+.list-items{list-style:none;padding:0;margin:.7rem 0 0;display:flex;flex-direction:column;gap:.35rem}
+.list-items li{display:flex;align-items:center;gap:.5rem;padding:.35rem 0;border-top:1px solid var(--line)}
+.link-btn{flex:1;min-width:0;text-align:left;background:none;border:0;color:var(--accent);font:inherit;cursor:pointer;padding:.2rem 0}
+.link-btn:hover{text-decoration:underline}
+.icon-x{background:none;border:0;color:var(--muted);font-size:1.2rem;cursor:pointer;padding:0 .4rem;line-height:1}
+.icon-x:hover{color:var(--alert)}
+@keyframes flashIt{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 3px transparent}}
+.flash{animation:flashIt 1.8s ease-out}
+@media(prefers-reduced-motion:reduce){.flash{animation:none;outline:2px solid var(--accent)}}
 /* esquemas ampliables: tocar abre a pantalla completa */
 figure svg{cursor:zoom-in}
 figure.fig-zoom{position:fixed;inset:0;z-index:60;margin:0;border:0;border-radius:0;background:var(--bg);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 56px) max(12px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
@@ -215,12 +247,16 @@ caption{caption-side:bottom;text-align:left;font-size:.75rem;color:var(--muted);
 <section id="s-anatomia" hidden>
   <div class="kicker">Módulo 1</div><h2>Anatomía quirúrgica</h2>
   <p class="lead">Cada tema resume lo que el cirujano debe identificar, las variantes que cambian la conducta y la estructura que se lesiona con más frecuencia. Toque un esquema para verlo ampliado.</p>
+  <div class="toolbar"><input type="search" id="anatSearch" placeholder="Buscar en anatomía: Calot, Hesselbach, recurrente…" aria-label="Buscar en anatomía" style="flex:1;min-width:200px"></div>
+  <p class="lead" id="anatEmpty" hidden>No hay temas que coincidan con la búsqueda.</p>
   <div id="anatList"></div>
 </section>
 
 <section id="s-fisiologia" hidden>
   <div class="kicker">Módulo 2</div><h2>Fisiología del paciente quirúrgico</h2>
   <p class="lead">Hemodinamia, líquidos, respuesta metabólica y coagulación.</p>
+  <div class="toolbar"><input type="search" id="fisSearch" placeholder="Buscar en fisiología: shock, Ringer, TTPa, ASA…" aria-label="Buscar en fisiología" style="flex:1;min-width:200px"></div>
+  <p class="lead" id="fisEmpty" hidden>No hay contenidos que coincidan con la búsqueda.</p>
   <div class="two">
     <div class="card">
       <h3>Clasificación del shock hemorrágico (ATLS)</h3>
@@ -271,6 +307,8 @@ caption{caption-side:bottom;text-align:left;font-size:.75rem;color:var(--muted);
 <section id="s-tecnicas" hidden>
   <div class="kicker">Módulo 4</div><h2>Técnicas quirúrgicas</h2>
   <p class="lead">Resumen paso a paso de procedimientos frecuentes. Es una guía de estudio; la técnica se aprende con supervisión.</p>
+  <div class="toolbar"><input type="search" id="techSearch" placeholder="Buscar técnica, paso o sutura: Kocher, malla, PDS…" aria-label="Buscar en técnicas" style="flex:1;min-width:200px"></div>
+  <p class="lead" id="techEmpty" hidden>No hay técnicas que coincidan con la búsqueda.</p>
   <div id="techList"></div>
   <h3 style="margin-top:1.6rem">Materiales de sutura</h3>
   <div class="tbl"><table id="sutTbl"></table></div>
@@ -280,6 +318,8 @@ caption{caption-side:bottom;text-align:left;font-size:.75rem;color:var(--muted);
 <section id="s-modelos3d" hidden>
   <div class="kicker">Módulo 5</div><h2>Modelos 3D interactivos</h2>
   <p class="lead">Arrastre para rotar, use la rueda o pellizque para acercar y toque una estructura para ver su relevancia quirúrgica. Son modelos esquemáticos, no escalas anatómicas exactas.</p>
+  <div class="toolbar"><input type="search" id="m3dSearch" placeholder="Buscar estructura: colédoco, coronaria, páncreas…" aria-label="Buscar estructura en los modelos" style="flex:1;min-width:200px"></div>
+  <p class="lead" id="m3dHint" hidden></p>
   <div class="toolbar" id="modelChips"></div>
   <div class="viewer">
     <div class="stage" id="stage"><div class="hint">arrastrar · rueda · tocar</div></div>
@@ -296,6 +336,13 @@ caption{caption-side:bottom;text-align:left;font-size:.75rem;color:var(--muted);
   <div class="grid" id="calcGrid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr))"></div>
 </section>
 
+<section id="s-listas" hidden>
+  <div class="kicker">Módulo 8</div><h2>Mis listas</h2>
+  <p class="lead">Guarde temas, técnicas, fármacos, calculadoras y estructuras 3D con el ícono de marcador para repasarlos después. Las listas se guardan solo en este dispositivo.</p>
+  <div class="toolbar"><input id="newListName" placeholder="Nombre de la nueva lista (p. ej., Guardia, Examen)" aria-label="Nombre de la nueva lista" style="flex:1;min-width:200px"><button class="btn" type="button" id="newListBtn">Crear lista</button></div>
+  <div id="listsWrap" class="lists-wrap"></div>
+</section>
+
 <section id="s-repaso" hidden>
   <div class="kicker">Módulo 7</div><h2>Repaso rápido</h2>
   <p class="lead">Preguntas de práctica con explicación.</p>
@@ -306,6 +353,13 @@ caption{caption-side:bottom;text-align:left;font-size:.75rem;color:var(--muted);
 <footer>Atlas Quirúrgico es una herramienta de estudio. Cada tema, tabla, técnica y calculadora indica sus referencias en formato Vancouver; confirme siempre con la bibliografía y los protocolos vigentes de su institución.</footer>
 </div>
 
+<dialog id="saveDlg" class="save-dlg" aria-labelledby="saveDlgT">
+  <h3 id="saveDlgT">Guardar en lista</h3>
+  <p class="save-item" id="saveDlgItem"></p>
+  <div id="saveDlgLists" class="save-lists"></div>
+  <div class="toolbar"><input id="saveDlgNew" placeholder="Nombre de una lista nueva" aria-label="Nombre de una lista nueva" style="flex:1;min-width:0"><button class="btn ghost" type="button" id="saveDlgAdd">Crear</button></div>
+  <div class="toolbar" style="justify-content:flex-end;margin-bottom:0"><button class="btn" type="button" id="saveDlgOk">Listo</button></div>
+</dialog>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const $=(s,r=document)=>r.querySelector(s);
@@ -380,6 +434,18 @@ function refList(keys,plates={}){
 }
 const withRefs=h=>cite(h).join('');
 
+/* ---------- listas guardadas (solo en este dispositivo) ---------- */
+const fold=s=>String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const slug=s=>fold(s).replace(/<[^>]*>/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
+const escA=s=>esc(s).replace(/"/g,'&quot;');
+const LS_KEY='aq-listas';
+function loadLists(){try{const d=JSON.parse(localStorage.getItem(LS_KEY));if(d&&Array.isArray(d.lists))return d}catch(e){}return {lists:[{id:'fav',name:'Favoritos',items:[]}]}}
+let LISTS=loadLists();
+function saveLists(){try{localStorage.setItem(LS_KEY,JSON.stringify(LISTS))}catch(e){}}
+const isSaved=k=>LISTS.lists.some(l=>l.items.some(it=>it.k===k));
+const BOOKMARK='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>';
+const saveBtn=(k,t)=>`<button type="button" class="save-btn" data-save-key="${escA(k)}" data-save-title="${escA(t)}" aria-pressed="${isSaved(k)}" aria-label="Guardar en lista: ${escA(t)}" title="Guardar en lista">${BOOKMARK}</button>`;
+
 /* ---------- navegación ---------- */
 const ICON={
  inicio:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
@@ -390,9 +456,10 @@ const ICON={
  modelos3d:'<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/>',
  calculadoras:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11.5h.01M12 11.5h.01M16 11.5h.01M8 15.5h.01M12 15.5h.01M16 15.5h.01"/>',
  repaso:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 13l2 2 4-4"/>'};
-const COL={inicio:'',anatomia:'red',fisiologia:'',farmacologia:'red',tecnicas:'',modelos3d:'red',calculadoras:'',repaso:'red'};
+ICON.listas='<path d="M6 3h12v18l-6-4-6 4z"/>';
+const COL={inicio:'',anatomia:'red',fisiologia:'',farmacologia:'red',tecnicas:'',modelos3d:'red',calculadoras:'',repaso:'red',listas:''};
 const ico=(id,s=18,w=1.75)=>`<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[id]}</svg>`;
-const MODS=[['inicio','Inicio','Inicio'],['anatomia','Anatomía','Anatomía'],['fisiologia','Fisiología','Fisio'],['farmacologia','Farmacología','Fármacos'],['tecnicas','Técnicas','Técnicas'],['modelos3d','Modelos 3D','3D'],['calculadoras','Calculadoras','Calc'],['repaso','Repaso','Repaso']];
+const MODS=[['inicio','Inicio','Inicio'],['anatomia','Anatomía','Anatomía'],['fisiologia','Fisiología','Fisio'],['farmacologia','Farmacología','Fármacos'],['tecnicas','Técnicas','Técnicas'],['modelos3d','Modelos 3D','3D'],['calculadoras','Calculadoras','Calc'],['repaso','Repaso','Repaso'],['listas','Mis listas','Listas']];
 const tabs=$('#tabs');
 tabs.innerHTML=MODS.map(([id,l,s])=>`<button data-go="${id}">${ico(id)}<span class="lbl-l">${l}</span><span class="lbl-s">${s}</span></button>`).join('');
 MODS.slice(1).forEach(([id])=>{const s=$('#s-'+id),k=s.querySelector('.kicker'),h=k.nextElementSibling,l=h.nextElementSibling;
@@ -417,7 +484,8 @@ $('#homeCards').innerHTML=[
  ['farmacologia','Farmacología','Anestésicos, relajantes, analgesia, profilaxis antibiótica, anticoagulación y vasopresores.'],
  ['tecnicas','Técnicas quirúrgicas','Colecistectomía, apendicectomía, Lichtenstein, tiroidectomía, anastomosis, gastrectomía, hemicolectomía, laparotomía en trauma, traqueostomía y suturas.'],
  ['modelos3d','Modelos 3D','Corazón con coronarias y abdomen superior con vasos, vía biliar y órganos.'],
- ['calculadoras','Calculadoras','Ranson, BISAP, APACHE II, Child-Pugh, Glasgow, Parkland, Cockcroft-Gault y más, con buscador.']
+ ['calculadoras','Calculadoras','Ranson, BISAP, APACHE II, Child-Pugh, Glasgow, Parkland, Cockcroft-Gault y más, con buscador.'],
+ ['listas','Mis listas','Guarde temas, técnicas, fármacos, calculadoras y estructuras 3D en listas propias para repasarlos.']
 ].map(([id,t,d])=>`<a class="card home-card ${COL[id]}" href="#${id}"><span class="ico-tile">${ico(id,24)}</span><h3>${t}</h3><p>${d}</p><span class="go">Abrir →</span></a>`).join('');
 $('#heroArt').innerHTML=`<svg viewBox="0 0 400 300" style="width:100%;height:100%" role="img" aria-label="Esquema del triángulo hepatocístico">
 <path d="M0 70 C80 40 200 30 400 60 L400 0 L0 0Z" style="fill:var(--soft);stroke:var(--muted)" stroke-width="1"/>
@@ -610,7 +678,7 @@ const ANAT=[
 <li><b>McBurney:</b> incisión oblicua que divide las fibras musculares (sin cortarlas). <b>Kocher</b> subcostal derecha para vesícula.{{sabiston}}</li>
 <li><b>Puertos laparoscópicos:</b> los vasos epigástricos inferiores se visualizan por transiluminación o laparoscopía antes de colocar trocares laterales.{{sabiston,netter@238}}</li></ul>`}
 ];
-$('#anatList').innerHTML=ANAT.map((a,i)=>`<details ${i===0?'open':''}><summary><span>${a.t}</span><span class="pill">${a.tag}</span></summary><div class="body">${withRefs(a.html+(a.figs||(a.svg?[{svg:a.svg,cap:a.cap}]:[])).map(f=>`<figure>${f.svg}<figcaption>${f.cap}</figcaption></figure>`).join(''))}</div></details>`).join('');
+$('#anatList').innerHTML=ANAT.map((a,i)=>`<details data-save="anat:${slug(a.t)}" ${i===0?'open':''}><summary><span>${a.t}</span><span class="sum-r"><span class="pill">${a.tag}</span>${saveBtn('anat:'+slug(a.t),a.t)}</span></summary><div class="body">${withRefs(a.html+(a.figs||(a.svg?[{svg:a.svg,cap:a.cap}]:[])).map(f=>`<figure>${f.svg}<figcaption>${f.cap}</figcaption></figure>`).join(''))}</div></details>`).join('');
 
 /* ---------- fisiología ---------- */
 const SHOCK=[
@@ -697,7 +765,7 @@ const DREF={'Propofol':'gg,miller','Etomidato':'gg,miller','Ketamina':'gg,miller
 function renderDrugs(){
   const q=$('#drugSearch').value.toLowerCase();
   const rows=DRUGS.filter(d=>(drugCat==='Todos'||d[0]===drugCat)&&(d.join(' ').toLowerCase().includes(q)));
-  const [body,list]=cite(rows.map(d=>`<tr><td><span class="pill">${d[0]}</span></td><td><b>${d[1]}</b></td><td class="num" style="white-space:normal">${d[2]}</td><td>${d[3]}{{${DREF[d[1]]||'gg'}}}</td></tr>`).join(''));
+  const [body,list]=cite(rows.map(d=>`<tr data-save="farm:${slug(d[1])}"><td><span class="pill">${d[0]}</span></td><td><span class="name-cell"><b>${d[1]}</b>${saveBtn('farm:'+slug(d[1]),d[1])}</span></td><td class="num" style="white-space:normal">${d[2]}</td><td>${d[3]}{{${DREF[d[1]]||'gg'}}}</td></tr>`).join(''));
   $('#drugTbl').innerHTML=`<tr><th>Clase</th><th>Fármaco</th><th>Dosis habitual</th><th>Advertencia clave</th></tr>`+
    (rows.length?body:`<tr><td colspan="4">Sin resultados.</td></tr>`);
   $('#drugRefs').innerHTML=list;
@@ -750,7 +818,7 @@ const TREF=[
  {ind:'mitchell,sabiston',pos:'sabiston',s:{3:'sabiston'},st:'mitchell',risk:'mitchell,sabiston'}];
 $('#techList').innerHTML=TECH.map((t,i)=>{
   const r=TREF[i]||{},m=k=>k?`{{${k}}}`:'',sm=j=>m((r.s||{})[j]||(j===t.steps.length-1?r.st:''));
-  return `<details ${i===0?'open':''}><summary><span>${t.t}</span><span class="pill">${t.tag}</span></summary><div class="body">`+withRefs(`
+  return `<details data-save="tec:${slug(t.t)}" ${i===0?'open':''}><summary><span>${t.t}</span><span class="sum-r"><span class="pill">${t.tag}</span>${saveBtn('tec:'+slug(t.t),t.t)}</span></summary><div class="body">`+withRefs(`
 <div class="meta"><div><span>Indicaciones</span>${t.ind}${m(r.ind)}</div><div><span>Posición</span>${t.pos}</div><div><span>Acceso</span>${t.via}${m(r.pos)}</div></div>
 <ol class="steps">${t.steps.map((s,j)=>`<li>${s}${sm(j)}</li>`).join('')}</ol><div class="risk"><b>Puntos de riesgo.</b> ${t.risk}${m(r.risk)}</div>`)+`</div></details>`}).join('');
 tbl('#sutTbl',['Material','Tipo','Pérdida de resistencia / absorción','Usos habituales'],[
@@ -834,7 +902,7 @@ const CREF=['mosteller,devine','cockcroft','holliday,miller','baxter,atls','pugh
 /* palabras clave extra para el buscador (mismo orden que CALCS) */
 const CKW=['imc peso talla superficie corporal obesidad devine mosteller','renal riñón creatinina depuración filtrado','líquidos sueros ayuno pediatría holliday','quemaduras líquidos reanimación','cirrosis hígado hepatopatía riesgo quirúrgico','neurológico trauma coma conciencia tce','anestesia local lidocaína bupivacaína ropivacaína toxicidad last','electrolitos calcio albúmina acidosis anion gap','sangrado hemorragia transfusión hematocrito presión arterial media',
  'páncreas pancreatitis gravedad pronóstico biliar alcohol','páncreas pancreatitis bisap mortalidad pronóstico','uci terapia intensiva gravedad mortalidad sepsis pronóstico apache'];
-$('#calcGrid').innerHTML=CALCS.map((c,i)=>{const [ct,cl]=cite(`${c.t}{{${CREF[i]}}}`);return `<div class="card calc" data-i="${i}" data-k="${CKW[i]||''}"><h3>${ct}</h3><div class="fields">${c.f.map(([k,l,x],j)=>{
+$('#calcGrid').innerHTML=CALCS.map((c,i)=>{const [ct,cl]=cite(`${c.t}{{${CREF[i]}}}`);return `<div class="card calc" data-i="${i}" data-k="${CKW[i]||''}" data-save="calc:${slug(c.t)}"><div class="calc-head"><h3>${ct}</h3>${saveBtn('calc:'+slug(c.t),c.t)}</div><div class="fields">${c.f.map(([k,l,x],j)=>{
   const id=`c${i}_${k}`;
   if(Array.isArray(x)){const o=[];for(let n=0;n<x.length;n+=2)o.push([x[n],x[n+1]]);return `<label>${l}<select id="${id}" data-k="${k}">${sel(o)}</select></label>`}
   return `<label>${l}<input id="${id}" data-k="${k}" type="number" step="any" value="${x}" inputmode="decimal"></label>`}).join('')}</div><div class="res" id="r${i}"></div>${cl}</div>`}).join('');
@@ -973,6 +1041,7 @@ function loadModel(k){
   V.root.position.set(0,0,0);V.reset();
   $('#parts').innerHTML=V.parts.map(p=>`<div class="part"><input type="checkbox" checked data-v="${p.id}" aria-label="Mostrar ${p.name}"><button data-s="${p.id}" aria-pressed="false"><span class="sw" style="background:${p.col}"></span><span>${p.name}</span></button></div>`).join('');
   select(null);
+  const s=$('#m3dSearch');if(s&&s.value)s.dispatchEvent(new Event('input'));
 }
 function select(id){
   if(!V)return;V.sel=id;
@@ -987,12 +1056,130 @@ function select(id){
    'abdomen:st':'moore,netter@258,netter@282','abdomen:sp':'sabiston,moore,netter@281','abdomen:pan':'moore,sabiston,netter@279','abdomen:duo':'moore,sabiston,netter@261,netter@279',
    'abdomen:pv':'moore,netter@279,netter@290','abdomen:cel':'moore,netter@282','abdomen:sma':'moore,netter@279,netter@286','abdomen:kid':'moore,netter@311',
    'abdomen:ao':'moore,sabiston,netter@247','abdomen:ivc':'moore,atls,netter@248','abdomen:colon':'moore,netter@287','abdomen:sb':'moore,netter@253'};
-  $('#pinfo').innerHTML=p?withRefs(`<b>${p.name}</b><p>${p.d}{{${PREF[curKey+':'+p.id]||'moore'}}}</p>`):'Seleccione una estructura de la lista o tóquela en el modelo.';
+  $('#pinfo').innerHTML=p?withRefs(`<div class="calc-head"><b>${p.name}</b>${saveBtn(`m3d:${curKey}:${p.id}`,`${p.name} · ${MODELS[curKey].name}`)}</div><p>${p.d}{{${PREF[curKey+':'+p.id]||'moore'}}}</p>`):'Seleccione una estructura de la lista o tóquela en el modelo.';
 }
 $('#parts').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b)select(V.sel===b.dataset.s?null:b.dataset.s)});
 $('#parts').addEventListener('change',e=>{const c=e.target.dataset.v;if(!c)return;const p=V.parts.find(p=>p.id===c);p.obj.visible=e.target.checked});
 
 document.querySelectorAll('[data-refs]').forEach(e=>{e.innerHTML=withRefs(e.innerHTML)});
+
+/* ---------- buscadores por sección ---------- */
+const tokens=s=>fold(s).split(/[^a-z0-9]+/).filter(Boolean);
+function matchQ(text,q){const ws=tokens(q);if(!ws.length)return true;const ts=tokens(text);return ws.every(w=>ts.some(t=>t.startsWith(w)))}
+/* Filtra las filas de una tabla (el encabezado queda); devuelve cuántas quedan visibles */
+function rowFilter(table,q,showAll){let n=0;[...table.rows].forEach(r=>{if(r.querySelector('th'))return;const ok=showAll||matchQ(r.textContent,q);r.hidden=!ok;if(ok)n++});return n}
+/* Temas en <details>: oculta los que no coinciden y abre los que sí cuando la búsqueda es útil */
+function detailsSearch(inputId,listSel,emptyId,extra){
+  const inp=$('#'+inputId);
+  inp.addEventListener('input',()=>{const q=inp.value.trim();let n=0;
+    document.querySelectorAll(listSel).forEach((d,i)=>{const ok=matchQ(d.textContent,q);d.hidden=!ok;if(ok)n++;
+      if(q.length>=3)d.open=ok;else if(!q)d.open=i===0});
+    if(extra)n+=extra(q);
+    $('#'+emptyId).hidden=!q||n>0});
+}
+detailsSearch('anatSearch','#anatList > details','anatEmpty');
+detailsSearch('techSearch','#techList > details','techEmpty',q=>{
+  const w=$('#sutTbl').closest('.tbl'),h=w.previousElementSibling,note=w.nextElementSibling;
+  const n=rowFilter($('#sutTbl'),q,!q||matchQ(h.textContent,q));
+  w.hidden=h.hidden=n===0;note.hidden=!!q&&!matchQ(note.textContent,q);return n+(note.hidden?0:1)});
+/* Fisiología: tarjetas y tablas; si el título coincide se muestra el bloque completo */
+$('#shockTbl').closest('.tbl').dataset.title='Clasificación del shock hemorrágico ATLS hemorragia hipovolemia';
+$('#fisSearch').addEventListener('input',e=>{
+  const q=e.target.value.trim(),sec=$('#s-fisiologia');let n=0;
+  sec.querySelectorAll('.card').forEach(c=>{const title=((c.querySelector('h3')||{}).textContent||'')+' '+[...c.querySelectorAll('th')].map(t=>t.textContent).join(' ');const tbls=[...c.querySelectorAll('table')];let vis;
+    if(!q||matchQ(title,q)){tbls.forEach(t=>rowFilter(t,q,true));vis=true}
+    else if(tbls.length)vis=tbls.reduce((s,t)=>s+rowFilter(t,q),0)>0;
+    else vis=matchQ(c.textContent,q);
+    c.hidden=!vis;if(vis)n++});
+  sec.querySelectorAll('.tbl').forEach(w=>{if(w.closest('.card'))return;
+    const box=w.parentElement.classList.contains('two')?w.parentElement:w,prev=box.previousElementSibling;
+    const head=w.querySelector('tr');
+    const title=(w.dataset.title||'')+' '+(prev&&prev.tagName==='H3'?prev.textContent:'')+' '+(head?head.textContent:'');
+    const vis=rowFilter(w.querySelector('table'),q,!q||matchQ(title,q))>0;w.hidden=!vis;if(vis)n++});
+  sec.querySelectorAll('.note').forEach(nt=>{nt.hidden=!!q&&!matchQ(nt.textContent,q);if(!nt.hidden&&q)n++});
+  sec.querySelectorAll('.two').forEach(t=>{t.hidden=[...t.children].every(c=>c.hidden)});
+  sec.querySelectorAll(':scope > h3').forEach(h=>{const nx=h.nextElementSibling;h.hidden=!!(nx&&nx.hidden)});
+  $('#fisEmpty').hidden=!q||n>0;
+});
+/* Modelos 3D: filtra la lista de estructuras y avisa si la búsqueda está en el otro modelo */
+const MODEL_TXT={};
+const modelTxt=k=>MODEL_TXT[k]||(MODEL_TXT[k]=MODELS[k].build().map(p=>({id:p.id,name:p.name,d:p.d})));
+$('#m3dSearch').addEventListener('input',e=>{
+  const q=e.target.value.trim(),hint=$('#m3dHint');if(!V){hint.hidden=true;return}
+  let first=null,n=0;
+  document.querySelectorAll('#parts .part').forEach(row=>{const id=row.querySelector('[data-s]').dataset.s,p=V.parts.find(p=>p.id===id);
+    const ok=matchQ(p.name+' '+p.d,q);row.hidden=!ok;if(ok){n++;first=first||id}});
+  const others=q?Object.keys(MODELS).filter(k=>k!==curKey&&modelTxt(k).some(p=>matchQ(p.name+' '+p.d,q))):[];
+  if(q&&n===1)select(first);
+  hint.hidden=!q||(n>0&&!others.length);
+  hint.innerHTML=(n?'':'No hay estructuras que coincidan en este modelo. ')+(others.length?'También aparece en: '+others.map(k=>`<button type="button" class="chip" data-goto-model="${k}">${MODELS[k].name}</button>`).join(' '):'');
+});
+$('#m3dHint').addEventListener('click',e=>{const b=e.target.closest('[data-goto-model]');if(b)loadModel(b.dataset.gotoModel)});
+
+/* ---------- guardar en listas ---------- */
+document.querySelectorAll('#s-fisiologia h3').forEach(h=>{const t=h.textContent.trim(),k='fis:'+slug(t);
+  (h.closest('.card')||h).dataset.save=k;h.classList.add('with-save');h.insertAdjacentHTML('beforeend',saveBtn(k,t))});
+const TYPE_LABEL={anat:'Anatomía',fis:'Fisiología',farm:'Farmacología',tec:'Técnica',calc:'Calculadora',m3d:'Modelo 3D'};
+const SEC_OF={anat:'anatomia',fis:'fisiologia',farm:'farmacologia',tec:'tecnicas',calc:'calculadoras',m3d:'modelos3d'};
+let dlgItem=null;
+const dlg=$('#saveDlg');
+function refreshSaveBtns(){document.querySelectorAll('.save-btn').forEach(b=>b.setAttribute('aria-pressed',isSaved(b.dataset.saveKey)))}
+function renderDlgLists(){
+  $('#saveDlgLists').innerHTML=LISTS.lists.length?LISTS.lists.map(l=>`<label class="save-row"><input type="checkbox" data-list="${l.id}" ${l.items.some(it=>it.k===dlgItem.k)?'checked':''}><span>${esc(l.name)}</span><span class="save-n">${l.items.length}</span></label>`).join(''):'<p class="lead" style="font-size:.88rem">Todavía no tiene listas. Escriba un nombre abajo para crear la primera.</p>';
+}
+function openSaveDlg(btn){
+  dlgItem={k:btn.dataset.saveKey,t:btn.dataset.saveTitle};
+  $('#saveDlgItem').textContent=dlgItem.t;$('#saveDlgNew').value='';renderDlgLists();
+  if(dlg.showModal)dlg.showModal();else dlg.setAttribute('open','');
+}
+function closeSaveDlg(){if(dlg.close)dlg.close();else dlg.removeAttribute('open')}
+document.addEventListener('click',e=>{const b=e.target.closest('.save-btn');if(!b)return;e.preventDefault();e.stopPropagation();openSaveDlg(b)},true);
+$('#saveDlgLists').addEventListener('change',e=>{const l=LISTS.lists.find(l=>l.id===e.target.dataset.list);if(!l)return;
+  if(e.target.checked){if(!l.items.some(it=>it.k===dlgItem.k))l.items.push({...dlgItem})}else l.items=l.items.filter(it=>it.k!==dlgItem.k);
+  saveLists();refreshSaveBtns();renderDlgLists();renderLists()});
+function createList(name,withItem){name=name.trim();if(!name)return null;const l={id:'l'+Date.now().toString(36),name,items:withItem?[{...withItem}]:[]};LISTS.lists.push(l);saveLists();return l}
+$('#saveDlgAdd').addEventListener('click',()=>{if(createList($('#saveDlgNew').value,dlgItem)){$('#saveDlgNew').value='';refreshSaveBtns();renderDlgLists();renderLists()}else $('#saveDlgNew').focus()});
+$('#saveDlgNew').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#saveDlgAdd').click()}});
+$('#saveDlgOk').addEventListener('click',closeSaveDlg);
+dlg.addEventListener('click',e=>{if(e.target===dlg)closeSaveDlg()});
+/* Módulo Mis listas */
+function renderLists(){
+  $('#listsWrap').innerHTML=LISTS.lists.length?LISTS.lists.map(l=>`<div class="card list-card" data-list="${l.id}">
+  <div class="list-head"><h3>${esc(l.name)}</h3><span class="pill">${l.items.length} ${l.items.length===1?'elemento':'elementos'}</span>
+   <span class="list-actions"><button class="btn ghost sm" type="button" data-act="rename">Renombrar</button><button class="btn ghost sm" type="button" data-act="del">Eliminar</button></span></div>
+  <div class="list-rename toolbar" hidden><input value="${escA(l.name)}" aria-label="Nuevo nombre de la lista" style="flex:1;min-width:0"><button class="btn sm" type="button" data-act="rename-ok">Guardar nombre</button></div>
+  <div class="list-confirm" hidden><span>¿Eliminar la lista «${esc(l.name)}» con ${l.items.length} ${l.items.length===1?'elemento':'elementos'}?</span><button class="btn sm danger" type="button" data-act="del-ok">Sí, eliminar</button><button class="btn ghost sm" type="button" data-act="del-no">Cancelar</button></div>
+  ${l.items.length?`<ul class="list-items">${l.items.map(it=>{const ty=it.k.split(':')[0];return `<li><span class="pill">${TYPE_LABEL[ty]||''}</span><button class="link-btn" type="button" data-open="${escA(it.k)}">${esc(it.t)}</button><button class="icon-x" type="button" data-act="rm" data-k="${escA(it.k)}" aria-label="Quitar ${escA(it.t)} de la lista">×</button></li>`}).join('')}</ul>`
+   :'<p class="lead" style="font-size:.9rem;margin:.6rem 0 0">Lista vacía. Toque el marcador junto a un tema, técnica, fármaco, calculadora o estructura 3D para agregarlo.</p>'}
+</div>`).join(''):'<p class="lead">No tiene listas. Cree una arriba.</p>';
+}
+$('#newListBtn').addEventListener('click',()=>{if(createList($('#newListName').value)){$('#newListName').value='';renderLists()}else $('#newListName').focus()});
+$('#newListName').addEventListener('keydown',e=>{if(e.key==='Enter')$('#newListBtn').click()});
+$('#listsWrap').addEventListener('click',e=>{
+  const open=e.target.closest('[data-open]');if(open)return openItem(open.dataset.open);
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const card=b.closest('.list-card'),l=LISTS.lists.find(x=>x.id===card.dataset.list),act=b.dataset.act;
+  if(act==='rm'){l.items=l.items.filter(it=>it.k!==b.dataset.k);saveLists();refreshSaveBtns();renderLists()}
+  else if(act==='rename'){card.querySelector('.list-rename').hidden=false;card.querySelector('.list-rename input').focus()}
+  else if(act==='rename-ok'){const v=card.querySelector('.list-rename input').value.trim();if(v){l.name=v;saveLists();renderLists()}}
+  else if(act==='del'){card.querySelector('.list-confirm').hidden=false}
+  else if(act==='del-no'){card.querySelector('.list-confirm').hidden=true}
+  else if(act==='del-ok'){LISTS.lists=LISTS.lists.filter(x=>x!==l);saveLists();refreshSaveBtns();renderLists()}
+});
+/* Abre el elemento guardado en su sección y lo resalta */
+function openItem(k){
+  const [ty,a,b]=k.split(':'),sec=SEC_OF[ty];if(!sec)return;
+  history.pushState(null,'','#'+sec);show(sec);
+  ['anatSearch','techSearch','fisSearch','calcSearch','m3dSearch','drugSearch'].forEach(id=>{const i=$('#'+id);if(i&&i.value){i.value='';i.dispatchEvent(new Event('input'))}});
+  if(ty==='farm'&&drugCat!=='Todos'){drugCat='Todos';$('#drugChips').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.cat==='Todos'));renderDrugs()}
+  let el;
+  if(ty==='m3d'){if(V){loadModel(a);select(b)}el=$('#stage')}
+  else el=document.querySelector(`[data-save="${CSS.escape(k)}"]`);
+  if(!el)return;
+  if(el.tagName==='DETAILS')el.open=true;
+  setTimeout(()=>{el.scrollIntoView({block:'start'});window.scrollBy(0,-72);el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')},30);
+}
+renderLists();
 /* Ampliar esquemas: tocar el dibujo lo abre a pantalla completa; tocar de nuevo, Cerrar o Esc lo cierra */
 const figClose=document.createElement('button');figClose.className='btn fig-close';figClose.type='button';figClose.textContent='Cerrar';figClose.hidden=true;document.body.append(figClose);
 function closeFig(){const z=document.querySelector('figure.fig-zoom');if(z)z.classList.remove('fig-zoom');figClose.hidden=true;document.body.style.overflow=''}
