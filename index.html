@@ -100,10 +100,15 @@ figcaption{font-size:.8rem;color:var(--muted);padding:.3rem .3rem 0}
 /* 3D */
 .viewer{display:grid;grid-template-columns:1fr 300px;gap:1rem;margin-top:1rem}
 @media(max-width:860px){.viewer{grid-template-columns:1fr}}
-.stage{position:relative;height:440px;background:radial-gradient(circle at 50% 40%,var(--surface),var(--soft));border:1px solid var(--line);border-radius:8px;overflow:hidden;touch-action:none;cursor:grab;min-width:0}
+.stage{position:relative;height:440px;background:radial-gradient(circle at 50% 38%,#ffffff 0%,#f0f2f5 55%,#dfe4ea 100%);border:1px solid var(--line);border-radius:8px;overflow:hidden;touch-action:none;cursor:grab;min-width:0}
 @media(max-width:600px){.stage{height:340px}}
 .stage canvas{display:block;width:100%;height:100%}
-.stage .hint{position:absolute;left:10px;bottom:8px;font:11px var(--mono);color:var(--muted);pointer-events:none}
+.stage .hint{position:absolute;left:10px;bottom:8px;font:11px var(--mono);color:#5b6170;pointer-events:none}
+.stage .fail{color:#3a4453}
+.body-inset{position:absolute;top:10px;right:10px;width:44px;height:auto;pointer-events:none}
+.body-inset .limb{fill:none;stroke:#ecc3a3;stroke-width:6;stroke-linecap:round}
+.body-inset .trunk{fill:#ecc3a3;stroke:#b98a68;stroke-width:1}
+#insetBox{fill:rgba(31,79,209,.14);stroke:#1f4fd1;stroke-width:1.6}
 .stage .fail{padding:1.5rem;color:var(--muted)}
 .parts{display:flex;flex-direction:column;gap:.3rem;min-width:0}
 .part{display:flex;align-items:center;gap:.5rem;font-size:.85rem}
@@ -322,12 +327,13 @@ caption{caption-side:bottom;text-align:left;font-size:.75rem;color:var(--muted);
 
 <section id="s-modelos3d" hidden>
   <div class="kicker">Módulo 5</div><h2>Modelos 3D interactivos</h2>
-  <p class="lead">Arrastre para rotar, use la rueda o pellizque para acercar y toque una estructura para ver su relevancia quirúrgica. Son modelos esquemáticos, no escalas anatómicas exactas.</p>
+  <p class="lead">Los órganos se muestran dentro de un cuerpo translúcido con esqueleto para ubicarlos. Arrastre para rotar, use la rueda o pellizque para acercar y toque una estructura para ver su relevancia quirúrgica. Son modelos esquemáticos, no escalas anatómicas exactas.</p>
   <div class="toolbar"><input type="search" id="m3dSearch" placeholder="Buscar estructura: colédoco, coronaria, páncreas…" aria-label="Buscar estructura en los modelos" style="flex:1;min-width:200px"></div>
   <p class="lead" id="m3dHint" hidden></p>
   <div class="toolbar" id="modelChips"></div>
   <div class="viewer">
-    <div class="stage" id="stage"><div class="hint">arrastrar · rueda · tocar</div></div>
+    <div class="stage" id="stage"><div class="hint">arrastrar · rueda · tocar</div>
+      <svg class="body-inset" viewBox="0 0 60 120" aria-hidden="true"><path class="limb" d="M16,24 L9,50 L7,68 M44,24 L51,50 L53,68 M24,72 L22,114 M36,72 L38,114"/><circle class="trunk" cx="30" cy="10" r="7"/><path class="trunk" d="M27,16h6v6h-6z"/><path class="trunk" d="M17,21 L43,21 L46,31 L45,62 L41,72 L19,72 L15,62 L14,31 Z"/><rect id="insetBox" x="12" y="21" width="36" height="25" rx="3"/></svg></div>
     <div class="parts" id="parts"></div>
   </div>
   <div class="pinfo" id="pinfo">Seleccione una estructura.</div>
@@ -978,28 +984,67 @@ renderQuiz();
 function tubeOf(pts,r,col,seg=40){const c=new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(...p)));return new THREE.Mesh(new THREE.TubeGeometry(c,seg,r,10,false),new THREE.MeshStandardMaterial({color:col,roughness:.5}))}
 function blob(r,col,pos,sc=[1,1,1],rough=.55){const m=new THREE.Mesh(new THREE.SphereGeometry(r,32,24),new THREE.MeshStandardMaterial({color:col,roughness:rough}));m.position.set(...pos);m.scale.set(...sc);return m}
 function cyl(r,h,col,pos,rot){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,20),new THREE.MeshStandardMaterial({color:col,roughness:.5}));m.position.set(...pos);if(rot)m.rotation.set(...rot);return m}
+/* Contexto corporal translúcido (piel, esqueleto, pulmones, diafragma) para ubicar los órganos; no se puede seleccionar */
+const SKIN=0xe8b48f,BONE=0xe6dcc3,LUNG=0xf0a3a3,DIAPH=0xc98272;
+const ghostMat=(color,op)=>new THREE.MeshStandardMaterial({color,transparent:true,opacity:op,roughness:.85,depthWrite:false,side:THREE.DoubleSide});
+function torso(profile,zs){const m=new THREE.Mesh(new THREE.LatheGeometry(profile.map(([r,y])=>new THREE.Vector2(r,y)),56),ghostMat(SKIN,.14));m.scale.set(1,1,zs);return m}
+/* Costilla: anillo horizontal abierto por delante (gap), inclinado hacia abajo en su parte anterior */
+function ribRing(y,r,zs,gap,tilt=.2,op=.62){const g=new THREE.TorusGeometry(r,.075,6,64,Math.PI*2-gap);g.rotateZ(Math.PI/2+gap/2);
+  const m=new THREE.Mesh(g,ghostMat(BONE,op));m.rotation.x=Math.PI/2+tilt;m.scale.set(1,zs,1);m.position.y=y;return m}
+function boneBox(w,h,d,pos){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),ghostMat(BONE,.75));m.position.set(...pos);return m}
+function spine(y0,y1,z,step=.42,r=.3){const g=new THREE.Group();for(let y=y0;y>=y1;y-=step){const v=new THREE.Mesh(new THREE.CylinderGeometry(r,r,step*.72,16),ghostMat(BONE,.75));v.position.set(0,y,z);g.add(v)}return g}
+function boneTube(pts,r=.09){const c=new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(...p)));return new THREE.Mesh(new THREE.TubeGeometry(c,32,r,8,false),ghostMat(BONE,.75))}
+function ghostBlob(col,op,pos,sc){const m=new THREE.Mesh(new THREE.SphereGeometry(1,32,20),ghostMat(col,op));m.position.set(...pos);m.scale.set(...sc);return m}
+function dome(pos,r,sy,op=.24){const m=new THREE.Mesh(new THREE.SphereGeometry(r,40,16,0,Math.PI*2,0,Math.PI/2),ghostMat(DIAPH,op));m.position.set(...pos);m.scale.set(1,sy,.62);return m}
+function sideLabel(text,pos){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');
+  x.font='600 30px "IBM Plex Sans","Segoe UI",sans-serif';x.fillStyle='#3a4453';x.textAlign='center';x.textBaseline='middle';x.fillText(text,128,32);
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true}));s.scale.set(2.2,.55,1);s.position.set(...pos);s.renderOrder=10;return s}
+function bodyContext(kind){const g=new THREE.Group();
+  if(kind==='torax'){
+    g.add(torso([[0,6.7],[.95,6.7],[1.05,5.6],[1.9,5.0],[3.9,4.45],[4.35,3.6],[4.3,1.5],[4.05,-1.0],[3.75,-3.2],[3.6,-4.6],[0,-4.6]],.6));
+    const R=[2.3,3.0,3.55,3.85,3.98,4.0,3.95,3.85,3.72,3.6],GAP=[.45,.45,.45,.5,.55,.6,.7,1.1,1.5,1.9];
+    R.forEach((r,i)=>g.add(ribRing(3.75-i*.6,r,.58,GAP[i])));
+    const st=boneBox(.5,3.6,.16,[0,2.15,2.3]);st.material.opacity=.3;g.add(st);
+    g.add(spine(4.6,-3.6,-1.95));
+    [-1,1].forEach(s=>{g.add(boneTube([[s*.45,4.15,2.2],[s*2,4.35,1.7],[s*3.6,4.55,.55]]));g.add(ghostBlob(LUNG,.2,[s*2.35,1.1,-.1],[1.35,2.6,1.3]))});
+    g.add(dome([0,-3.0,0],3.8,.38));
+    g.add(sideLabel('Derecha',[-3.4,5.2,0]));g.add(sideLabel('Izquierda',[3.4,5.2,0]));
+  }else{
+    g.add(torso([[3.4,5.2],[3.45,3.2],[3.2,1.2],[3.0,-1.0],[3.1,-2.6],[3.35,-3.6],[2.85,-4.7],[0,-4.9]],.62));
+    [[2.1,3.4,.7],[1.6,3.45,1.0],[1.1,3.4,1.5],[.6,3.3,2.0],[.1,3.15,3.6],[-.4,3.0,4.1]].forEach(([y,r,gap])=>g.add(ribRing(y,r,.6,gap,.25)));
+    const xi=boneBox(.45,1.0,.14,[0,2.4,2.1]);xi.material.opacity=.35;g.add(xi);
+    g.add(spine(4.4,-3.0,-1.6,.5,.36));
+    g.add(dome([0,.35,0],3.1,.52));
+    [-1,1].forEach(s=>{const w=ghostBlob(BONE,.3,[s*2.0,-3.5,-.6],[1.0,1.0,.3]);w.rotation.y=s*.55;g.add(w);
+      g.add(boneTube([[s*.85,-2.9,-1.45],[s*2.2,-2.55,-.8],[s*2.75,-2.9,.3],[s*2.55,-3.4,.9]],.1))});
+    g.add(boneBox(1.1,1.5,.45,[0,-3.6,-1.5]));
+    g.add(boneTube([[-2.05,-4.2,.6],[-1.0,-4.6,1.3],[0,-4.75,1.5],[1.0,-4.6,1.3],[2.05,-4.2,.6]],.12));
+    g.add(sideLabel('Derecha',[-2.9,4.4,0]));g.add(sideLabel('Izquierda',[2.9,4.4,0]));
+  }
+  return g;
+}
 const MODELS={
- corazon:{name:'Corazón y coronarias',build(){return [
-  {id:'lv',name:'Ventrículo izquierdo',col:'#c0392b',obj:(()=>{const m=blob(1,0xc0392b,[.62,-.55,-.3],[.95,1.35,.95]);m.rotation.z=.45;return m})(),d:'Pared de 8–12 mm. Su isquemia causa la mayoría de los infartos y la insuficiencia cardiaca. Abordaje de cirugía valvular mitral y aórtica por esternotomía.'},
-  {id:'rv',name:'Ventrículo derecho',col:'#5b7bc0',obj:(()=>{const m=blob(.9,0x5b7bc0,[-.18,-.45,.4],[1.05,1.15,.85]);m.rotation.z=.35;return m})(),d:'Cara anterior del corazón, por detrás del esternón: riesgo de lesión en reesternotomía y trauma penetrante.'},
-  {id:'la',name:'Aurícula izquierda',col:'#e07a6e',obj:blob(.55,0xe07a6e,[.6,.85,-.55]),d:'Su orejuela es sitio de trombos en fibrilación auricular; puede ocluirse o resecarse quirúrgicamente.'},
-  {id:'ra',name:'Aurícula derecha',col:'#7d96d1',obj:blob(.65,0x7d96d1,[-1.0,.35,0]),d:'Sitio habitual de canulación venosa para circulación extracorpórea.'},
-  {id:'ao',name:'Aorta ascendente y arco',col:'#d9534f',obj:tubeOf([[-.1,.85,.15],[-.2,1.75,.05],[.2,2.35,-.3],[.85,2.15,-.75],[1.0,1.0,-.9]],.28,0xd9534f),d:'Sitio de canulación arterial, pinzamiento aórtico y cardioplejía. Las coronarias nacen de los senos de Valsalva.'},
-  {id:'pa',name:'Tronco pulmonar',col:'#6a89d0',obj:tubeOf([[.2,.72,.75],[.4,1.5,.6],[.62,1.85,.15],[.48,1.95,-.3]],.25,0x6a89d0),d:'Sale del ventrículo derecho y se bifurca en las arterias pulmonares. Ligamento arterioso (restos del conducto).'},
+ corazon:{name:'Corazón y coronarias',ctx:'torax',cam:{y:1.0,dist:14},build(){return [
+  {id:'lv',name:'Ventrículo izquierdo',col:'#9e3b2f',obj:(()=>{const m=blob(1,0x9e3b2f,[.62,-.55,-.3],[.95,1.35,.95]);m.rotation.z=.45;return m})(),d:'Pared de 8–12 mm. Su isquemia causa la mayoría de los infartos y la insuficiencia cardiaca. Abordaje de cirugía valvular mitral y aórtica por esternotomía.'},
+  {id:'rv',name:'Ventrículo derecho',col:'#b8604c',obj:(()=>{const m=blob(.9,0xb8604c,[-.18,-.45,.4],[1.05,1.15,.85]);m.rotation.z=.35;return m})(),d:'Cara anterior del corazón, por detrás del esternón: riesgo de lesión en reesternotomía y trauma penetrante.'},
+  {id:'la',name:'Aurícula izquierda',col:'#a2505a',obj:blob(.55,0xa2505a,[.6,.85,-.55]),d:'Su orejuela es sitio de trombos en fibrilación auricular; puede ocluirse o resecarse quirúrgicamente.'},
+  {id:'ra',name:'Aurícula derecha',col:'#a85f6e',obj:blob(.65,0xa85f6e,[-1.0,.35,0]),d:'Sitio habitual de canulación venosa para circulación extracorpórea.'},
+  {id:'ao',name:'Aorta ascendente y arco',col:'#d32f2f',obj:tubeOf([[-.1,.85,.15],[-.2,1.75,.05],[.2,2.35,-.3],[.85,2.15,-.75],[1.0,1.0,-.9]],.28,0xd32f2f),d:'Sitio de canulación arterial, pinzamiento aórtico y cardioplejía. Las coronarias nacen de los senos de Valsalva.'},
+  {id:'pa',name:'Tronco pulmonar',col:'#4f74c8',obj:tubeOf([[.2,.72,.75],[.4,1.5,.6],[.62,1.85,.15],[.48,1.95,-.3]],.25,0x4f74c8),d:'Sale del ventrículo derecho y se bifurca en las arterias pulmonares. Ligamento arterioso (restos del conducto).'},
   {id:'svc',name:'Vena cava superior',col:'#4f6fb5',obj:cyl(.2,1.4,0x4f6fb5,[-.85,1.45,-.1]),d:'Drena la parte superior del cuerpo a la aurícula derecha. Se canula en cirugía cardiaca para bypass bicaval.'},
   {id:'ivc',name:'Vena cava inferior',col:'#4f6fb5',obj:cyl(.22,1.2,0x4f6fb5,[-.95,-.55,-.25]),d:'Retorno venoso de abdomen y miembros inferiores.'},
-  {id:'lad',name:'Arteria descendente anterior',col:'#ffd23f',obj:tubeOf([[.42,.72,.42],[.5,.3,.72],[.58,-.35,.92],[.7,-1.05,.74],[.82,-1.7,.25]],.06,0xffd23f),d:'Nace de la coronaria izquierda y recorre el surco interventricular anterior. Irriga la pared anterior y el septo (“la viuda”). Injerto habitual con arteria mamaria interna izquierda (LIMA).'},
-  {id:'lcx',name:'Arteria circunfleja',col:'#ffb830',obj:tubeOf([[.4,.8,.45],[1.1,.55,.25],[1.38,0,-.3],[1.05,-.5,-.85]],.055,0xffb830),d:'Recorre el surco auriculoventricular izquierdo. Irriga la pared lateral; en dominancia izquierda da la descendente posterior.'},
-  {id:'rca',name:'Arteria coronaria derecha',col:'#ff9f1c',obj:tubeOf([[-.15,.85,.5],[-.75,.55,.78],[-1.2,-.1,.62],[-1.05,-.9,.22],[-.45,-1.3,-.38]],.06,0xff9f1c),d:'Irriga ventrículo derecho, nodo sinusal (~ 60 %) y nodo AV (~ 80 %). Su oclusión causa infarto inferior y bloqueos.'},
-  {id:'pda',name:'Arteria descendente posterior',col:'#e8890c',obj:tubeOf([[-.45,-1.3,-.38],[.05,-1.4,-.62],[.55,-1.6,-.5]],.055,0xe8890c),d:'Recorre el surco interventricular posterior hacia el vértice. En la dominancia derecha, la más frecuente, nace de la arteria coronaria derecha e irriga la cara inferior y el tercio posterior del septo.'}
+  {id:'lad',name:'Arteria descendente anterior',col:'#ff2a2a',obj:tubeOf([[.42,.72,.42],[.5,.3,.72],[.58,-.35,.92],[.7,-1.05,.74],[.82,-1.7,.25]],.075,0xff2a2a),d:'Nace de la coronaria izquierda y recorre el surco interventricular anterior. Irriga la pared anterior y el septo (“la viuda”). Injerto habitual con arteria mamaria interna izquierda (LIMA).'},
+  {id:'lcx',name:'Arteria circunfleja',col:'#ff4d3a',obj:tubeOf([[.4,.8,.45],[1.1,.55,.25],[1.38,0,-.3],[1.05,-.5,-.85]],.07,0xff4d3a),d:'Recorre el surco auriculoventricular izquierdo. Irriga la pared lateral; en dominancia izquierda da la descendente posterior.'},
+  {id:'rca',name:'Arteria coronaria derecha',col:'#ff3b30',obj:tubeOf([[-.15,.85,.5],[-.75,.55,.78],[-1.2,-.1,.62],[-1.05,-.9,.22],[-.45,-1.3,-.38]],.075,0xff3b30),d:'Irriga ventrículo derecho, nodo sinusal (~ 60 %) y nodo AV (~ 80 %). Su oclusión causa infarto inferior y bloqueos.'},
+  {id:'pda',name:'Arteria descendente posterior',col:'#e8433a',obj:tubeOf([[-.45,-1.3,-.38],[.05,-1.4,-.62],[.55,-1.6,-.5]],.07,0xe8433a),d:'Recorre el surco interventricular posterior hacia el vértice. En la dominancia derecha, la más frecuente, nace de la arteria coronaria derecha e irriga la cara inferior y el tercio posterior del septo.'}
  ]}},
- abdomen:{name:'Abdomen superior',build(){const bil=tubeOf([[-.5,.62,.25],[-.55,.35,.35],[-.62,0,.12],[-.78,-.3,-.08],[-.88,-.38,-.12]],.07,0x55b45a);
+ abdomen:{name:'Abdomen superior',ctx:'abdomen',cam:{y:-.2,dist:12},build(){const bil=tubeOf([[-.5,.62,.25],[-.55,.35,.35],[-.62,0,.12],[-.78,-.3,-.08],[-.88,-.38,-.12]],.07,0x55b45a);
   const cys=tubeOf([[-.9,.28,.55],[-.72,.36,.45],[-.56,.34,.36]],.05,0x2e8b57);
-  const ao=cyl(.17,3.8,0xd9534f,[.45,-.3,-1.05]);const ivc=cyl(.2,3.8,0x4f6fb5,[-.1,-.3,-1.0]);
+  const ao=cyl(.17,3.8,0xd32f2f,[.45,-.3,-1.05]);const ivc=cyl(.2,3.8,0x2f5fb3,[-.1,-.3,-1.0]);
   const colon=tubeOf([[-2.1,-1.8,.2],[-2.2,-.2,.2],[-1.9,.9,.4],[-.8,.2,.8],[.6,.3,.8],[1.6,1.1,.5],[2.15,1.55,.1],[2.2,.2,.1],[2.1,-1.8,.2]],.2,0xd8b48a,90);
   const sb=new THREE.Mesh(new THREE.TorusKnotGeometry(.5,.18,120,14,3,5),new THREE.MeshStandardMaterial({color:0xe3a1a1,roughness:.5}));sb.position.set(0,-1.45,.4);sb.scale.set(1.25,.75,.7);
   return [
-  {id:'liver',name:'Hígado',col:'#8c4a2f',obj:blob(1,0x8c4a2f,[-1.15,.65,.1],[1.65,.95,1.05]),d:'Mayor víscera sólida. Ocho segmentos de Couinaud. Trauma abdominal cerrado: laceración y hemorragia. Maniobra de Pringle (pinzar el pedículo) para controlar sangrado.'},
+  {id:'liver',name:'Hígado',col:'#8b3a2b',obj:blob(1,0x8b3a2b,[-1.15,.65,.1],[1.65,.95,1.05]),d:'Mayor víscera sólida. Ocho segmentos de Couinaud. Trauma abdominal cerrado: laceración y hemorragia. Maniobra de Pringle (pinzar el pedículo) para controlar sangrado.'},
   {id:'gb',name:'Vesícula biliar',col:'#2e8b57',obj:blob(.3,0x2e8b57,[-.95,.0,.6],[.8,1.6,.8]),d:'Se almacena y concentra la bilis. Arteria cística (rama de la hepática derecha). Colecistitis aguda se opera idealmente en las primeras 72 horas.'},
   {id:'cys',name:'Conducto cístico',col:'#2e8b57',obj:cys,d:'Une la vesícula con el hepático común. Se clipa y secciona tras lograr la visión crítica de seguridad.'},
   {id:'cbd',name:'Colédoco',col:'#55b45a',obj:bil,d:'Se forma por la unión del cístico con el hepático común y desemboca en la ampolla de Vater junto al conducto pancreático. Su lesión es la complicación grave más temida de la colecistectomía laparoscópica.'},
@@ -1010,9 +1055,9 @@ const MODELS={
   {id:'pv',name:'Vena porta',col:'#3f5fa8',obj:tubeOf([[.15,-.2,-.35],[-.15,.15,-.15],[-.45,.55,.05]],.1,0x3f5fa8),d:'Se forma detrás del cuello del páncreas por la unión de las venas mesentérica superior y esplénica. Asciende en el ligamento hepatoduodenal, por detrás del colédoco y de la arteria hepática.'},
   {id:'cel',name:'Tronco celíaco y ramas',col:'#e2574c',obj:(()=>{const g=new THREE.Group();g.add(tubeOf([[.45,.4,-.95],[.45,.45,-.6]],.07,0xe2574c));g.add(tubeOf([[.45,.45,-.6],[0,.5,-.3],[-.45,.62,.12]],.05,0xe2574c));g.add(tubeOf([[.45,.45,-.6],[1.1,.4,-.55],[1.85,.55,-.5]],.05,0xe2574c));return g})(),d:'Nace de la aorta a nivel de T12 y se divide en gástrica izquierda, hepática común (hacia el hígado) y esplénica, que recorre el borde superior del páncreas hacia el bazo.'},
   {id:'sma',name:'Arteria mesentérica superior',col:'#e2574c',obj:tubeOf([[.45,.1,-.95],[.42,-.25,-.25],[.3,-1.1,.15]],.06,0xe2574c),d:'Nace de la aorta a nivel de L1, pasa por detrás del cuello del páncreas y por delante de la porción horizontal del duodeno. Irriga el intestino medio.'},
-  {id:'kid',name:'Riñones',col:'#7a2e2e',obj:(()=>{const g=new THREE.Group();[[-.95,-.35,-1.15],[1.2,-.1,-1.15]].forEach(p=>{const m=blob(.5,0x7a2e2e,p,[.7,1.2,.6]);g.add(m)});return g})(),d:'Retroperitoneales. Pedículo renal: vena anterior, arteria, pelvis posterior. El riñón izquierdo es más alto que el derecho.'},
-  {id:'ao',name:'Aorta abdominal',col:'#d9534f',obj:ao,d:'Desciende a la izquierda de la línea media; da celíaco (T12), mesentérica superior (L1), renales (L1–L2) y mesentérica inferior (L3). Bifurca en L4.'},
-  {id:'ivc',name:'Vena cava inferior',col:'#4f6fb5',obj:ivc,d:'A la derecha de la aorta. Lesión de IVC infrarrenal en trauma: sangrado profuso que requiere compresión directa.'},
+  {id:'kid',name:'Riñones',col:'#8a3324',obj:(()=>{const g=new THREE.Group();[[-.95,-.35,-1.15],[1.2,-.1,-1.15]].forEach(p=>{const m=blob(.5,0x8a3324,p,[.7,1.2,.6]);g.add(m)});return g})(),d:'Retroperitoneales. Pedículo renal: vena anterior, arteria, pelvis posterior. El riñón izquierdo es más alto que el derecho.'},
+  {id:'ao',name:'Aorta abdominal',col:'#d32f2f',obj:ao,d:'Desciende a la izquierda de la línea media; da celíaco (T12), mesentérica superior (L1), renales (L1–L2) y mesentérica inferior (L3). Bifurca en L4.'},
+  {id:'ivc',name:'Vena cava inferior',col:'#2f5fb3',obj:ivc,d:'A la derecha de la aorta. Lesión de IVC infrarrenal en trauma: sangrado profuso que requiere compresión directa.'},
   {id:'colon',name:'Colon (marco)',col:'#d8b48a',obj:colon,d:'Marco colónico: ciego, ascendente, transverso, descendente y sigmoide. Colon derecho irrigado por la AMS; izquierdo por la AMI.'},
   {id:'sb',name:'Intestino delgado',col:'#e3a1a1',obj:sb,d:'Yeyuno-íleon, de 3 a 7 m. Obstrucción por bridas en laparotomías previas. Resecciones mayores de 200 cm pueden causar síndrome de intestino corto.'}
  ]}}
@@ -1020,19 +1065,20 @@ const MODELS={
 let V=null,curKey=null;
 function initViewer(){
   const chips=$('#modelChips');
-  chips.innerHTML=Object.entries(MODELS).map(([k,m])=>`<button class="chip" data-m="${k}" aria-pressed="false">${m.name}</button>`).join('')+`<button class="chip" id="resetView">Restablecer vista</button>`;
-  chips.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(b)loadModel(b.dataset.m);if(e.target.id==='resetView'&&V)V.reset()});
+  chips.innerHTML=Object.entries(MODELS).map(([k,m])=>`<button class="chip" data-m="${k}" aria-pressed="false">${m.name}</button>`).join('')+`<button class="chip" id="bodyToggle" aria-pressed="true">Cuerpo y esqueleto</button><button class="chip" id="resetView">Restablecer vista</button>`;
+  chips.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(b)loadModel(b.dataset.m);if(e.target.id==='resetView'&&V)V.reset();
+    if(e.target.id==='bodyToggle'&&V){V.showBody=!V.showBody;e.target.setAttribute('aria-pressed',V.showBody);if(V.ctx)V.ctx.visible=V.showBody}});
   try{
     const host=$('#stage');
     const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
     renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));host.insertBefore(renderer.domElement,host.firstChild);
     const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(40,1,.1,100);
-    scene.add(new THREE.AmbientLight(0xffffff,.75));
+    scene.add(new THREE.HemisphereLight(0xffffff,0xc9b8a8,.65));scene.add(new THREE.AmbientLight(0xffffff,.25));
     const l1=new THREE.DirectionalLight(0xffffff,.9);l1.position.set(3,5,6);scene.add(l1);
     const l2=new THREE.DirectionalLight(0xffffff,.35);l2.position.set(-4,-2,-5);scene.add(l2);
     const root=new THREE.Group();scene.add(root);
-    V={renderer,scene,camera,root,host,parts:[],sel:null,
-      reset(){root.rotation.set(.1,.2,0);camera.position.set(0,0,this.dist=9)}};
+    V={renderer,scene,camera,root,host,parts:[],sel:null,showBody:true,
+      reset(){const c=(MODELS[curKey]||{}).cam||{y:0,dist:9};root.rotation.set(.08,.15,0);this.dist=c.dist;camera.position.set(0,c.y,c.dist);camera.lookAt(0,c.y,0)}};
     V.reset();
     function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
     new ResizeObserver(resize).observe(host);resize();
@@ -1046,7 +1092,7 @@ function initViewer(){
       root.rotation.y+=dx*.01;root.rotation.x=Math.max(-1.4,Math.min(1.4,root.rotation.x+dy*.01))});
     const up=e=>{pts.delete(e.pointerId);pinch=0;if(e.type==='pointerup'&&moved<5&&down)pick(e)};
     cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
-    function zoom(d){V.dist=Math.max(4.5,Math.min(15,V.dist+d));camera.position.z=V.dist}
+    function zoom(d){V.dist=Math.max(4.5,Math.min(22,V.dist+d));camera.position.z=V.dist}
     cv.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY*.01)},{passive:false});
     const ray=new THREE.Raycaster();
     function pick(e){const r=cv.getBoundingClientRect();
@@ -1063,6 +1109,8 @@ function loadModel(k){
   document.querySelectorAll('#modelChips [data-m]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===k));
   while(V.root.children.length)V.root.remove(V.root.children[0]);
   V.parts=MODELS[k].build();V.parts.forEach(p=>{V.root.add(p.obj);meshesOf(p.obj).forEach(m=>{m.material.transparent=true})});
+  V.ctx=bodyContext(MODELS[k].ctx);V.ctx.visible=V.showBody;V.root.add(V.ctx);
+  const ib=$('#insetBox');if(ib){const t=MODELS[k].ctx==='torax';ib.setAttribute('y',t?21:44);ib.setAttribute('height',t?25:28)}
   V.root.position.set(0,0,0);V.reset();
   $('#parts').innerHTML=V.parts.map(p=>`<div class="part"><input type="checkbox" checked data-v="${p.id}" aria-label="Mostrar ${p.name}"><button data-s="${p.id}" aria-pressed="false"><span class="sw" style="background:${p.col}"></span><span>${p.name}</span></button></div>`).join('');
   select(null);
