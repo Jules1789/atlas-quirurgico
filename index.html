@@ -480,6 +480,51 @@ const SVG_INGUINAL_CANAL=`<svg viewBox="0 0 520 290" style="max-height:none" rol
 <text x="260" y="262" class="ig-s" text-anchor="middle">Contenido: cordón espermático o ligamento redondo,</text>
 <text x="260" y="278" class="ig-s" text-anchor="middle">nervio ilioinguinal y rama genital del genitofemoral</text>
 </svg>`;
+/* Esquema propio de tiroides, paratiroides y nervios laríngeos en vista posterior (verificado con Netter, láminas 68–70) */
+const SVG_TIROIDES=`<svg viewBox="0 0 560 525" style="max-height:none" role="img" aria-label="Vista posterior de la tiroides con paratiroides, arterias tiroideas y nervios laríngeos recurrentes">
+<defs><pattern id="thHatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" style="fill:var(--surface)"/><line x1="0" y1="0" x2="0" y2="6" style="stroke:var(--ink)" stroke-width="2"/></pattern></defs>
+<path d="M392,500 L436,345" style="stroke:var(--alert)" stroke-width="10" stroke-linecap="round" fill="none"/>
+<path d="M436,345 C470,338 510,338 552,350" style="stroke:var(--alert)" stroke-width="9" stroke-linecap="round" fill="none"/>
+<path d="M436,345 L436,14" style="stroke:var(--alert)" stroke-width="7" stroke-linecap="round" fill="none"/>
+<path d="M392,500 C380,455 300,440 230,445 C170,450 120,462 95,500" style="stroke:var(--alert)" stroke-width="16" fill="none"/>
+<path d="M140,452 C130,380 124,300 124,14" style="stroke:var(--alert)" stroke-width="7" stroke-linecap="round" fill="none"/>
+<path d="M110,466 C80,450 50,445 8,448" style="stroke:var(--alert)" stroke-width="9" stroke-linecap="round" fill="none"/>
+<ellipse cx="220" cy="190" rx="44" ry="80" style="fill:var(--accent-soft);stroke:var(--accent)" stroke-width="1.5"/>
+<ellipse cx="340" cy="190" rx="44" ry="80" style="fill:var(--accent-soft);stroke:var(--accent)" stroke-width="1.5"/>
+<rect x="250" y="52" width="60" height="400" rx="20" style="fill:var(--surface);stroke:var(--muted)" stroke-width="1.5"/>
+<path d="M256,184H304M256,206H304M256,228H304M256,250H304M256,272H304M256,294H304M256,316H304M256,338H304M256,360H304M256,382H304M256,404H304M256,426H304" style="stroke:var(--line)" stroke-width="2"/>
+<rect x="234" y="104" width="16" height="30" style="fill:url(#thHatch)"/><rect x="310" y="104" width="16" height="30" style="fill:url(#thHatch)"/>
+<path d="M435,290 L332,236 L360,280 L436,357 Z" style="fill:var(--accent-soft);stroke:var(--accent)" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M470,342 C455,300 440,292 435,290 C400,270 360,245 322,228" style="stroke:var(--alert)" stroke-width="4" fill="none"/>
+<path d="M90,345 C105,300 120,292 125,290 C160,270 200,245 252,226" style="stroke:var(--alert)" stroke-width="4" fill="none"/>
+<path d="M470,14 C440,60 395,95 357,116" style="stroke:var(--alert)" stroke-width="4" fill="none"/>
+<path d="M90,14 C120,60 165,95 203,116" style="stroke:var(--alert)" stroke-width="4" fill="none"/>
+<path d="M462,14 C430,58 380,92 338,104" style="stroke:var(--ink)" stroke-width="1.5" stroke-dasharray="5 3" fill="none"/>
+<ellipse cx="204" cy="158" rx="9" ry="7" style="fill:var(--surface);stroke:var(--ink)" stroke-width="2"/><ellipse cx="356" cy="158" rx="9" ry="7" style="fill:var(--surface);stroke:var(--ink)" stroke-width="2"/>
+<ellipse cx="212" cy="246" rx="9" ry="7" style="fill:var(--surface);stroke:var(--ink)" stroke-width="2"/><ellipse cx="348" cy="246" rx="9" ry="7" style="fill:var(--surface);stroke:var(--ink)" stroke-width="2"/>
+<path d="M456,14 L456,505" style="stroke:var(--ink)" stroke-width="2.5" fill="none"/>
+<path d="M104,14 L104,505" style="stroke:var(--ink)" stroke-width="2.5" fill="none"/>
+<path d="M456,345 C460,368 470,380 452,380 C440,380 434,368 430,358 C410,330 380,300 360,280 L332,236 C326,200 320,140 318,96" style="stroke:var(--ink)" stroke-width="3.5" fill="none"/>
+<path d="M104,468 C104,500 140,505 160,488 C200,450 236,330 244,240 L246,96" style="stroke:var(--ink)" stroke-width="3.5" fill="none"/>
+<text x="280" y="78" class="ig-s" text-anchor="middle">Laringe</text>
+<text x="280" y="330" class="ig-s" text-anchor="middle" transform="rotate(-90 280 330)">Tráquea y esófago</text>
+<text x="280" y="150" class="ig-s" text-anchor="middle">Lig. de</text><text x="280" y="164" class="ig-s" text-anchor="middle">Berry</text>
+<text x="213" y="200" class="ig-s" text-anchor="middle">Lóbulo</text><text x="213" y="214" class="ig-s" text-anchor="middle">izquierdo</text>
+<text x="347" y="200" class="ig-s" text-anchor="middle">Lóbulo</text><text x="347" y="214" class="ig-s" text-anchor="middle">derecho</text>
+<text x="392" y="26" class="ig-s">Rama externa del</text><text x="392" y="41" class="ig-s">n. laríngeo superior</text>
+<text x="8" y="90" class="ig-s">A. tiroidea sup.</text>
+<text x="8" y="180" class="ig-s">A. carótida común</text>
+<text x="8" y="250" class="ig-s">N. vago</text>
+<text x="8" y="312" class="ig-r">A. tiroidea inf.</text>
+<text x="8" y="395" class="ig-t">Recurrente izquierdo</text><text x="8" y="411" class="ig-s">rodea el arco aórtico</text>
+<text x="552" y="150" class="ig-t" text-anchor="end">Paratiroides</text><text x="552" y="165" class="ig-s" text-anchor="end">superior</text><line x1="488" y1="158" x2="366" y2="158" style="stroke:var(--muted)"/>
+<text x="552" y="236" class="ig-t" text-anchor="end">Paratiroides</text><text x="552" y="251" class="ig-s" text-anchor="end">inferior</text><line x1="488" y1="244" x2="358" y2="246" style="stroke:var(--muted)"/>
+<text x="394" y="300" class="ig-b" text-anchor="middle">Triángulo</text><text x="394" y="315" class="ig-b" text-anchor="middle">de Beahrs</text>
+<text x="552" y="330" class="ig-s" text-anchor="end">A. subclavia</text>
+<text x="552" y="410" class="ig-t" text-anchor="end">Recurrente derecho</text><text x="552" y="426" class="ig-s" text-anchor="end">rodea la a. subclavia</text>
+<text x="190" y="432" class="ig-s" text-anchor="middle">Arco aórtico</text>
+<text x="280" y="518" class="ig-s" text-anchor="middle">Vista posterior: el lado derecho del paciente queda a la derecha</text>
+</svg>`;
 const ANAT=[
 {t:'Triángulo hepatocístico (de Calot) y vía biliar',tag:'Colecistectomía',svg:SVG_CALOT,cap:'Esquema: el triángulo se limita por el conducto cístico, el hepático común y el borde inferior del hígado.{{strasberg,moore,netter@276}}',html:`
 <ul class="tight"><li><b>Contenido:</b> arteria cística (rama de la hepática derecha), ganglio de Lund, tejido linfograso.{{moore,sabiston,netter@276}}</li>
@@ -495,7 +540,8 @@ const ANAT=[
 <li><b>Hernia indirecta:</b> sale por el anillo profundo, <u>lateral</u> a los vasos epigástricos inferiores. <b>Directa:</b> a través del triángulo de Hesselbach, <u>medial</u> a esos vasos (límites: vasos epigástricos, borde lateral del recto, ligamento inguinal).{{moore,herniasurge,netter@243}}</li>
 <li><b>Triángulo del desastre:</b> entre el conducto deferente y los vasos testiculares; contiene vasos ilíacos externos. No debe fijarse ni engraparse.{{sabiston}}</li>
 <li><b>Triángulo del dolor:</b> lateral a los vasos testiculares, bajo el tracto iliopúbico; contiene nervio femorocutáneo lateral y rama femoral del genitofemoral. No debe engraparse.{{sabiston,herniasurge}}</li></ul>`},
-{t:'Tiroides, nervio laríngeo recurrente y paratiroides',tag:'Tiroidectomía',html:`
+{t:'Tiroides, nervio laríngeo recurrente y paratiroides',tag:'Tiroidectomía',figs:[
+ {svg:SVG_TIROIDES,cap:'Esquema propio en vista posterior. El recurrente derecho rodea la arteria subclavia y asciende oblicuo; el izquierdo rodea el arco aórtico y asciende casi vertical en el surco traqueoesofágico. Las paratiroides superiores se sitúan a la altura del cartílago cricoides y las inferiores cerca del polo inferior, en relación con la arteria tiroidea inferior; su posición es más variable y pueden encontrarse más abajo, incluso en el mediastino.{{netter@68,netter@69,netter@70,moore}} Triángulo de Beahrs y ligamento de Berry como referencias quirúrgicas.{{sabiston}}'}],html:`
 <ul class="tight"><li><b>Irrigación:</b> arteria tiroidea superior (carótida externa) e inferior (tronco tirocervical). Ocasional arteria tiroidea ima.{{moore,netter@68,netter@69}}</li>
 <li><b>Nervio laríngeo recurrente:</b> asciende en el surco traqueoesofágico; el izquierdo rodea el arco aórtico y el derecho, la arteria subclavia derecha.{{netter@69}} Se encuentra en el triángulo de Beahrs (carótida, tráquea y arteria tiroidea inferior). Cerca del ligamento de Berry puede ser tironeado. Variante: nervio no recurrente derecho (&lt;1%).{{moore,sabiston}}</li>
 <li><b>Rama externa del laríngeo superior:</b> inerva el cricotiroideo; se lesiona al ligar el polo superior lejos de la glándula (pérdida de tono agudo).{{moore,sabiston,netter@69}}</li>
