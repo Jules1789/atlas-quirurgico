@@ -1,7 +1,7 @@
 {
   "name": "Atlas Quirúrgico",
   "short_name": "Atlas Qx",
-  "description": "Educación médica quirúrgica: anatomía, fisiología, farmacología, técnicas, modelos 3D y calculadoras, con referencias.",
+  "description": "Educación médica quirúrgica: anatomía, fisiología, farmacología, técnicas, calculadoras y repaso, con referencias.",
   "lang": "es",
   "id": "./",
   "start_url": "./",

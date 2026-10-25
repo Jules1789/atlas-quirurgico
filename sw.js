@@ -1,6 +1,6 @@
 /* Service worker de Atlas Quirúrgico: guarda la app para usarla sin conexión.
    Al publicar cambios, subir el número de VERSION para que los teléfonos descarguen la nueva versión. */
-const VERSION = 'v9';
+const VERSION = 'v10';
 const CACHE = 'atlas-qx-' + VERSION;
 const LOCAL = [
   './',
@@ -13,7 +13,6 @@ const LOCAL = [
   './icons/apple-touch-icon.png'
 ];
 const REMOTE = [
-  'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
   'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap'
 ];
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Educación médica quirúrgica: anatomía, fisiología, farmacología, técnicas, modelos 3D y calculadoras, con referencias.">
+<meta name="description" content="Educación médica quirúrgica: anatomía, fisiología, farmacología, técnicas, calculadoras y repaso, con referencias.">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#11141b" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
@@ -97,26 +97,6 @@ figcaption{font-size:.8rem;color:var(--muted);padding:.3rem .3rem 0}
 .res{background:var(--accent-soft);border-radius:6px;padding:.7rem .9rem;font-size:.9rem}
 .res b{font-family:var(--mono);font-weight:500;font-size:1.05rem}
 .res div+div{margin-top:.2rem}
-/* 3D */
-.viewer{display:grid;grid-template-columns:1fr 300px;gap:1rem;margin-top:1rem}
-@media(max-width:860px){.viewer{grid-template-columns:1fr}}
-.stage{position:relative;height:440px;background:radial-gradient(circle at 50% 38%,#ffffff 0%,#f0f2f5 55%,#dfe4ea 100%);border:1px solid var(--line);border-radius:8px;overflow:hidden;touch-action:none;cursor:grab;min-width:0}
-@media(max-width:600px){.stage{height:340px}}
-.stage canvas{display:block;width:100%;height:100%}
-.stage .hint{position:absolute;left:10px;bottom:8px;font:11px var(--mono);color:#5b6170;pointer-events:none}
-.stage .fail{color:#3a4453}
-.body-inset{position:absolute;top:10px;right:10px;width:44px;height:auto;pointer-events:none}
-.body-inset .limb{fill:none;stroke:#ecc3a3;stroke-width:6;stroke-linecap:round}
-.body-inset .trunk{fill:#ecc3a3;stroke:#b98a68;stroke-width:1}
-#insetBox{fill:rgba(31,79,209,.14);stroke:#1f4fd1;stroke-width:1.6}
-.stage .fail{padding:1.5rem;color:var(--muted)}
-.parts{display:flex;flex-direction:column;gap:.3rem;min-width:0}
-.part{display:flex;align-items:center;gap:.5rem;font-size:.85rem}
-.part button{flex:1;text-align:left;font:inherit;background:var(--surface);border:1px solid var(--line);color:var(--ink);padding:.3rem .6rem;border-radius:6px;cursor:pointer;display:flex;gap:.5rem;align-items:center;min-width:0}
-.part button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
-.sw{width:10px;height:10px;border-radius:50%;flex:none}
-.pinfo{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:.8rem 1rem;font-size:.88rem;margin-top:.5rem}
-.pinfo b{font-family:var(--serif);font-size:1.05rem}
 /* técnicas */
 .steps{counter-reset:s;list-style:none;padding:0;margin:.6rem 0;display:flex;flex-direction:column;gap:.5rem}
 .steps li{counter-increment:s;position:relative;padding:.6rem .8rem .6rem 3rem;background:var(--soft);border-radius:6px}
@@ -238,7 +218,7 @@ caption{caption-side:bottom;text-align:left;font-size:.75rem;color:var(--muted);
       <div class="kicker">Educación médica quirúrgica</div>
       <h1>Anatomía, fisiología y farmacología al servicio del quirófano</h1>
       <p class="lead">Consulta rápida para estudiantes de medicina y residentes: estructuras que se lesionan, fisiología que se descompensa, fármacos que se dosifican y pasos de las técnicas más frecuentes.</p>
-      <div class="toolbar"><button class="btn" data-go="modelos3d">Abrir modelos 3D</button><button class="btn ghost" data-go="calculadoras">Calculadoras</button></div>
+      <div class="toolbar"><button class="btn" data-go="anatomia">Abrir anatomía</button><button class="btn ghost" data-go="calculadoras">Calculadoras</button></div>
     </div>
     <div class="hero-art" id="heroArt"></div>
   </div>
@@ -325,22 +305,8 @@ caption{caption-side:bottom;text-align:left;font-size:.75rem;color:var(--muted);
   <div class="note" data-refs>Cierre de laparotomía media: sutura continua de monofilamento de absorción lenta con puntos pequeños (a 5 mm del borde aponeurótico y cada 5 mm), con relación longitud de sutura a longitud de herida ≥ 4:1. Frente a los puntos de 1 cm, esta técnica redujo la hernia incisional al año (13 % frente a 21 %).{{deerenberg}}</div>
 </section>
 
-<section id="s-modelos3d" hidden>
-  <div class="kicker">Módulo 5</div><h2>Modelos 3D interactivos</h2>
-  <p class="lead">Los órganos se muestran dentro de un cuerpo translúcido con esqueleto para ubicarlos. Arrastre para rotar, use la rueda o pellizque para acercar y toque una estructura para ver su relevancia quirúrgica. Son modelos esquemáticos, no escalas anatómicas exactas.</p>
-  <div class="toolbar"><input type="search" id="m3dSearch" placeholder="Buscar estructura: colédoco, coronaria, páncreas…" aria-label="Buscar estructura en los modelos" style="flex:1;min-width:200px"></div>
-  <p class="lead" id="m3dHint" hidden></p>
-  <div class="toolbar" id="modelChips"></div>
-  <div class="viewer">
-    <div class="stage" id="stage"><div class="hint">arrastrar · rueda · tocar</div>
-      <svg class="body-inset" viewBox="0 0 60 120" aria-hidden="true"><path class="limb" d="M16,24 L9,50 L7,68 M44,24 L51,50 L53,68 M24,72 L22,114 M36,72 L38,114"/><circle class="trunk" cx="30" cy="10" r="7"/><path class="trunk" d="M27,16h6v6h-6z"/><path class="trunk" d="M17,21 L43,21 L46,31 L45,62 L41,72 L19,72 L15,62 L14,31 Z"/><rect id="insetBox" x="12" y="21" width="36" height="25" rx="3"/></svg></div>
-    <div class="parts" id="parts"></div>
-  </div>
-  <div class="pinfo" id="pinfo">Seleccione una estructura.</div>
-</section>
-
 <section id="s-calculadoras" hidden>
-  <div class="kicker">Módulo 6</div><h2>Calculadoras clínicas</h2>
+  <div class="kicker">Módulo 5</div><h2>Calculadoras clínicas</h2>
   <p class="lead">Los valores iniciales son ejemplos; reemplácelos con los datos de su paciente.</p>
   <div class="toolbar"><input type="search" id="calcSearch" placeholder="Buscar calculadora: pancreatitis, renal, quemaduras…" aria-label="Buscar calculadora" style="flex:1;min-width:200px"></div>
   <p class="lead" id="calcEmpty" hidden>No hay calculadoras que coincidan con la búsqueda.</p>
@@ -348,8 +314,8 @@ caption{caption-side:bottom;text-align:left;font-size:.75rem;color:var(--muted);
 </section>
 
 <section id="s-listas" hidden>
-  <div class="kicker">Módulo 8</div><h2>Mis listas</h2>
-  <p class="lead">Guarde temas, técnicas, fármacos, calculadoras y estructuras 3D con el ícono de marcador para repasarlos después. Las listas se guardan solo en este dispositivo.</p>
+  <div class="kicker">Módulo 7</div><h2>Mis listas</h2>
+  <p class="lead">Guarde temas, técnicas, fármacos y calculadoras con el ícono de marcador para repasarlos después. Las listas se guardan solo en este dispositivo.</p>
   <div class="toolbar"><input id="newListName" placeholder="Nombre de la nueva lista (p. ej., Guardia, Examen)" aria-label="Nombre de la nueva lista" style="flex:1;min-width:200px"><button class="btn" type="button" id="newListBtn">Crear lista</button></div>
   <div class="toolbar"><button class="btn ghost" type="button" id="expBtn" aria-expanded="false">Exportar listas</button><button class="btn ghost" type="button" id="impBtn" aria-expanded="false">Importar listas</button></div>
   <div class="card xfer" id="expPanel" hidden>
@@ -375,7 +341,7 @@ caption{caption-side:bottom;text-align:left;font-size:.75rem;color:var(--muted);
 </section>
 
 <section id="s-repaso" hidden>
-  <div class="kicker">Módulo 7</div><h2>Repaso rápido</h2>
+  <div class="kicker">Módulo 6</div><h2>Repaso rápido</h2>
   <p class="lead">Preguntas de práctica con explicación.</p>
   <div class="card" id="quiz" style="max-width:760px"></div>
 </section>
@@ -391,7 +357,6 @@ caption{caption-side:bottom;text-align:left;font-size:.75rem;color:var(--muted);
   <div class="toolbar"><input id="saveDlgNew" placeholder="Nombre de una lista nueva" aria-label="Nombre de una lista nueva" style="flex:1;min-width:0"><button class="btn ghost" type="button" id="saveDlgAdd">Crear</button></div>
   <div class="toolbar" style="justify-content:flex-end;margin-bottom:0"><button class="btn" type="button" id="saveDlgOk">Listo</button></div>
 </dialog>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const $=(s,r=document)=>r.querySelector(s);
 const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
@@ -473,6 +438,8 @@ const LS_KEY='aq-listas';
 function loadLists(){try{const d=JSON.parse(localStorage.getItem(LS_KEY));if(d&&Array.isArray(d.lists))return d}catch(e){}return {lists:[{id:'fav',name:'Favoritos',items:[]}]}}
 let LISTS=loadLists();
 function saveLists(){try{localStorage.setItem(LS_KEY,JSON.stringify(LISTS))}catch(e){}}
+/* Los modelos 3D se retiraron: se quitan de las listas que los tuvieran guardados */
+if(LISTS.lists.some(l=>l.items.some(it=>it.k.startsWith('m3d:')))){LISTS.lists.forEach(l=>{l.items=l.items.filter(it=>!it.k.startsWith('m3d:'))});saveLists()}
 const isSaved=k=>LISTS.lists.some(l=>l.items.some(it=>it.k===k));
 const BOOKMARK='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>';
 const saveBtn=(k,t)=>`<button type="button" class="save-btn" data-save-key="${escA(k)}" data-save-title="${escA(t)}" aria-pressed="${isSaved(k)}" aria-label="Guardar en lista: ${escA(t)}" title="Guardar en lista">${BOOKMARK}</button>`;
@@ -484,25 +451,22 @@ const ICON={
  fisiologia:'<path d="M3 12h4l2-5 4 10 2-5h6"/>',
  farmacologia:'<rect x="2.5" y="8.5" width="19" height="7" rx="3.5" transform="rotate(-45 12 12)"/><path d="M9.5 9.5l5 5"/>',
  tecnicas:'<path d="M3 21l6.5-6.5"/><path d="M9.5 14.5 18 6a2.1 2.1 0 0 1 3 3l-7.5 9.5z"/>',
- modelos3d:'<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/>',
  calculadoras:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11.5h.01M12 11.5h.01M16 11.5h.01M8 15.5h.01M12 15.5h.01M16 15.5h.01"/>',
  repaso:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 13l2 2 4-4"/>'};
 ICON.listas='<path d="M6 3h12v18l-6-4-6 4z"/>';
-const COL={inicio:'',anatomia:'red',fisiologia:'',farmacologia:'red',tecnicas:'',modelos3d:'red',calculadoras:'',repaso:'red',listas:''};
+const COL={inicio:'',anatomia:'red',fisiologia:'',farmacologia:'red',tecnicas:'',calculadoras:'',repaso:'red',listas:''};
 const ico=(id,s=18,w=1.75)=>`<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[id]}</svg>`;
-const MODS=[['inicio','Inicio','Inicio'],['anatomia','Anatomía','Anatomía'],['fisiologia','Fisiología','Fisio'],['farmacologia','Farmacología','Fármacos'],['tecnicas','Técnicas','Técnicas'],['modelos3d','Modelos 3D','3D'],['calculadoras','Calculadoras','Calc'],['repaso','Repaso','Repaso'],['listas','Mis listas','Listas']];
+const MODS=[['inicio','Inicio','Inicio'],['anatomia','Anatomía','Anatomía'],['fisiologia','Fisiología','Fisio'],['farmacologia','Farmacología','Fármacos'],['tecnicas','Técnicas','Técnicas'],['calculadoras','Calculadoras','Calc'],['repaso','Repaso','Repaso'],['listas','Mis listas','Listas']];
 const tabs=$('#tabs');
 tabs.innerHTML=MODS.map(([id,l,s])=>`<button data-go="${id}">${ico(id)}<span class="lbl-l">${l}</span><span class="lbl-s">${s}</span></button>`).join('');
 MODS.slice(1).forEach(([id])=>{const s=$('#s-'+id),k=s.querySelector('.kicker'),h=k.nextElementSibling,l=h.nextElementSibling;
   const head=document.createElement('div');head.className='sec-head '+COL[id];s.insertBefore(head,k);
   const txt=document.createElement('div');txt.append(k,h);if(l&&l.classList.contains('lead'))txt.append(l);head.append(txt);
   head.insertAdjacentHTML('beforeend',`<div class="sec-art">${ico(id,64,1.25)}</div>`)});
-let viewerInit=false;
 function show(id){
   if(!MODS.some(m=>m[0]===id)) id='inicio';
   MODS.forEach(([m])=>{$('#s-'+m).hidden=m!==id});
   tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.go===id));
-  if(id==='modelos3d'&&!viewerInit){viewerInit=true;initViewer()}
   window.scrollTo(0,0);
 }
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){location.hash=g.dataset.go}});
@@ -514,9 +478,8 @@ $('#homeCards').innerHTML=[
  ['fisiologia','Fisiología','Shock hemorrágico, líquidos y electrolitos, respuesta metabólica, coagulación, ASA y ácido-base.'],
  ['farmacologia','Farmacología','Anestésicos, relajantes, analgesia, profilaxis antibiótica, anticoagulación y vasopresores.'],
  ['tecnicas','Técnicas quirúrgicas','Colecistectomía, apendicectomía, Lichtenstein, tiroidectomía, anastomosis, gastrectomía, hemicolectomía, laparotomía en trauma, traqueostomía y suturas.'],
- ['modelos3d','Modelos 3D','Corazón con coronarias y abdomen superior con vasos, vía biliar y órganos.'],
  ['calculadoras','Calculadoras','Ranson, BISAP, APACHE II, Child-Pugh, Glasgow, Parkland, Cockcroft-Gault y más, con buscador.'],
- ['listas','Mis listas','Guarde temas, técnicas, fármacos, calculadoras y estructuras 3D en listas propias para repasarlos.']
+ ['listas','Mis listas','Guarde temas, técnicas, fármacos y calculadoras en listas propias para repasarlos.']
 ].map(([id,t,d])=>`<a class="card home-card ${COL[id]}" href="#${id}"><span class="ico-tile">${ico(id,24)}</span><h3>${t}</h3><p>${d}</p><span class="go">Abrir →</span></a>`).join('');
 $('#heroArt').innerHTML=`<svg viewBox="0 0 400 300" style="width:100%;height:100%" role="img" aria-label="Esquema del triángulo hepatocístico">
 <path d="M0 70 C80 40 200 30 400 60 L400 0 L0 0Z" style="fill:var(--soft);stroke:var(--muted)" stroke-width="1"/>
@@ -980,159 +943,6 @@ function renderQuiz(){
 }
 renderQuiz();
 
-/* ---------- visor 3D ---------- */
-function tubeOf(pts,r,col,seg=40){const c=new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(...p)));return new THREE.Mesh(new THREE.TubeGeometry(c,seg,r,10,false),new THREE.MeshStandardMaterial({color:col,roughness:.5}))}
-function blob(r,col,pos,sc=[1,1,1],rough=.55){const m=new THREE.Mesh(new THREE.SphereGeometry(r,32,24),new THREE.MeshStandardMaterial({color:col,roughness:rough}));m.position.set(...pos);m.scale.set(...sc);return m}
-function cyl(r,h,col,pos,rot){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,20),new THREE.MeshStandardMaterial({color:col,roughness:.5}));m.position.set(...pos);if(rot)m.rotation.set(...rot);return m}
-/* Contexto corporal translúcido (piel, esqueleto, pulmones, diafragma) para ubicar los órganos; no se puede seleccionar */
-const SKIN=0xe8b48f,BONE=0xe6dcc3,LUNG=0xf0a3a3,DIAPH=0xc98272;
-const ghostMat=(color,op)=>new THREE.MeshStandardMaterial({color,transparent:true,opacity:op,roughness:.85,depthWrite:false,side:THREE.DoubleSide});
-function torso(profile,zs){const m=new THREE.Mesh(new THREE.LatheGeometry(profile.map(([r,y])=>new THREE.Vector2(r,y)),56),ghostMat(SKIN,.14));m.scale.set(1,1,zs);return m}
-/* Costilla: anillo horizontal abierto por delante (gap), inclinado hacia abajo en su parte anterior */
-function ribRing(y,r,zs,gap,tilt=.2,op=.62){const g=new THREE.TorusGeometry(r,.075,6,64,Math.PI*2-gap);g.rotateZ(Math.PI/2+gap/2);
-  const m=new THREE.Mesh(g,ghostMat(BONE,op));m.rotation.x=Math.PI/2+tilt;m.scale.set(1,zs,1);m.position.y=y;return m}
-function boneBox(w,h,d,pos){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),ghostMat(BONE,.75));m.position.set(...pos);return m}
-function spine(y0,y1,z,step=.42,r=.3){const g=new THREE.Group();for(let y=y0;y>=y1;y-=step){const v=new THREE.Mesh(new THREE.CylinderGeometry(r,r,step*.72,16),ghostMat(BONE,.75));v.position.set(0,y,z);g.add(v)}return g}
-function boneTube(pts,r=.09){const c=new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(...p)));return new THREE.Mesh(new THREE.TubeGeometry(c,32,r,8,false),ghostMat(BONE,.75))}
-function ghostBlob(col,op,pos,sc){const m=new THREE.Mesh(new THREE.SphereGeometry(1,32,20),ghostMat(col,op));m.position.set(...pos);m.scale.set(...sc);return m}
-function dome(pos,r,sy,op=.24){const m=new THREE.Mesh(new THREE.SphereGeometry(r,40,16,0,Math.PI*2,0,Math.PI/2),ghostMat(DIAPH,op));m.position.set(...pos);m.scale.set(1,sy,.62);return m}
-function sideLabel(text,pos){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');
-  x.font='600 30px "IBM Plex Sans","Segoe UI",sans-serif';x.fillStyle='#3a4453';x.textAlign='center';x.textBaseline='middle';x.fillText(text,128,32);
-  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true}));s.scale.set(2.2,.55,1);s.position.set(...pos);s.renderOrder=10;return s}
-function bodyContext(kind){const g=new THREE.Group();
-  if(kind==='torax'){
-    g.add(torso([[0,6.7],[.95,6.7],[1.05,5.6],[1.9,5.0],[3.9,4.45],[4.35,3.6],[4.3,1.5],[4.05,-1.0],[3.75,-3.2],[3.6,-4.6],[0,-4.6]],.6));
-    const R=[2.3,3.0,3.55,3.85,3.98,4.0,3.95,3.85,3.72,3.6],GAP=[.45,.45,.45,.5,.55,.6,.7,1.1,1.5,1.9];
-    R.forEach((r,i)=>g.add(ribRing(3.75-i*.6,r,.58,GAP[i])));
-    const st=boneBox(.5,3.6,.16,[0,2.15,2.3]);st.material.opacity=.3;g.add(st);
-    g.add(spine(4.6,-3.6,-1.95));
-    [-1,1].forEach(s=>{g.add(boneTube([[s*.45,4.15,2.2],[s*2,4.35,1.7],[s*3.6,4.55,.55]]));g.add(ghostBlob(LUNG,.2,[s*2.35,1.1,-.1],[1.35,2.6,1.3]))});
-    g.add(dome([0,-3.0,0],3.8,.38));
-    g.add(sideLabel('Derecha',[-3.4,5.2,0]));g.add(sideLabel('Izquierda',[3.4,5.2,0]));
-  }else{
-    g.add(torso([[3.4,5.2],[3.45,3.2],[3.2,1.2],[3.0,-1.0],[3.1,-2.6],[3.35,-3.6],[2.85,-4.7],[0,-4.9]],.62));
-    [[2.1,3.4,.7],[1.6,3.45,1.0],[1.1,3.4,1.5],[.6,3.3,2.0],[.1,3.15,3.6],[-.4,3.0,4.1]].forEach(([y,r,gap])=>g.add(ribRing(y,r,.6,gap,.25)));
-    const xi=boneBox(.45,1.0,.14,[0,2.4,2.1]);xi.material.opacity=.35;g.add(xi);
-    g.add(spine(4.4,-3.0,-1.6,.5,.36));
-    g.add(dome([0,.35,0],3.1,.52));
-    [-1,1].forEach(s=>{const w=ghostBlob(BONE,.3,[s*2.0,-3.5,-.6],[1.0,1.0,.3]);w.rotation.y=s*.55;g.add(w);
-      g.add(boneTube([[s*.85,-2.9,-1.45],[s*2.2,-2.55,-.8],[s*2.75,-2.9,.3],[s*2.55,-3.4,.9]],.1))});
-    g.add(boneBox(1.1,1.5,.45,[0,-3.6,-1.5]));
-    g.add(boneTube([[-2.05,-4.2,.6],[-1.0,-4.6,1.3],[0,-4.75,1.5],[1.0,-4.6,1.3],[2.05,-4.2,.6]],.12));
-    g.add(sideLabel('Derecha',[-2.9,4.4,0]));g.add(sideLabel('Izquierda',[2.9,4.4,0]));
-  }
-  return g;
-}
-const MODELS={
- corazon:{name:'Corazón y coronarias',ctx:'torax',cam:{y:1.0,dist:14},build(){return [
-  {id:'lv',name:'Ventrículo izquierdo',col:'#9e3b2f',obj:(()=>{const m=blob(1,0x9e3b2f,[.62,-.55,-.3],[.95,1.35,.95]);m.rotation.z=.45;return m})(),d:'Pared de 8–12 mm. Su isquemia causa la mayoría de los infartos y la insuficiencia cardiaca. Abordaje de cirugía valvular mitral y aórtica por esternotomía.'},
-  {id:'rv',name:'Ventrículo derecho',col:'#b8604c',obj:(()=>{const m=blob(.9,0xb8604c,[-.18,-.45,.4],[1.05,1.15,.85]);m.rotation.z=.35;return m})(),d:'Cara anterior del corazón, por detrás del esternón: riesgo de lesión en reesternotomía y trauma penetrante.'},
-  {id:'la',name:'Aurícula izquierda',col:'#a2505a',obj:blob(.55,0xa2505a,[.6,.85,-.55]),d:'Su orejuela es sitio de trombos en fibrilación auricular; puede ocluirse o resecarse quirúrgicamente.'},
-  {id:'ra',name:'Aurícula derecha',col:'#a85f6e',obj:blob(.65,0xa85f6e,[-1.0,.35,0]),d:'Sitio habitual de canulación venosa para circulación extracorpórea.'},
-  {id:'ao',name:'Aorta ascendente y arco',col:'#d32f2f',obj:tubeOf([[-.1,.85,.15],[-.2,1.75,.05],[.2,2.35,-.3],[.85,2.15,-.75],[1.0,1.0,-.9]],.28,0xd32f2f),d:'Sitio de canulación arterial, pinzamiento aórtico y cardioplejía. Las coronarias nacen de los senos de Valsalva.'},
-  {id:'pa',name:'Tronco pulmonar',col:'#4f74c8',obj:tubeOf([[.2,.72,.75],[.4,1.5,.6],[.62,1.85,.15],[.48,1.95,-.3]],.25,0x4f74c8),d:'Sale del ventrículo derecho y se bifurca en las arterias pulmonares. Ligamento arterioso (restos del conducto).'},
-  {id:'svc',name:'Vena cava superior',col:'#4f6fb5',obj:cyl(.2,1.4,0x4f6fb5,[-.85,1.45,-.1]),d:'Drena la parte superior del cuerpo a la aurícula derecha. Se canula en cirugía cardiaca para bypass bicaval.'},
-  {id:'ivc',name:'Vena cava inferior',col:'#4f6fb5',obj:cyl(.22,1.2,0x4f6fb5,[-.95,-.55,-.25]),d:'Retorno venoso de abdomen y miembros inferiores.'},
-  {id:'lad',name:'Arteria descendente anterior',col:'#ff2a2a',obj:tubeOf([[.42,.72,.42],[.5,.3,.72],[.58,-.35,.92],[.7,-1.05,.74],[.82,-1.7,.25]],.075,0xff2a2a),d:'Nace de la coronaria izquierda y recorre el surco interventricular anterior. Irriga la pared anterior y el septo (“la viuda”). Injerto habitual con arteria mamaria interna izquierda (LIMA).'},
-  {id:'lcx',name:'Arteria circunfleja',col:'#ff4d3a',obj:tubeOf([[.4,.8,.45],[1.1,.55,.25],[1.38,0,-.3],[1.05,-.5,-.85]],.07,0xff4d3a),d:'Recorre el surco auriculoventricular izquierdo. Irriga la pared lateral; en dominancia izquierda da la descendente posterior.'},
-  {id:'rca',name:'Arteria coronaria derecha',col:'#ff3b30',obj:tubeOf([[-.15,.85,.5],[-.75,.55,.78],[-1.2,-.1,.62],[-1.05,-.9,.22],[-.45,-1.3,-.38]],.075,0xff3b30),d:'Irriga ventrículo derecho, nodo sinusal (~ 60 %) y nodo AV (~ 80 %). Su oclusión causa infarto inferior y bloqueos.'},
-  {id:'pda',name:'Arteria descendente posterior',col:'#e8433a',obj:tubeOf([[-.45,-1.3,-.38],[.05,-1.4,-.62],[.55,-1.6,-.5]],.07,0xe8433a),d:'Recorre el surco interventricular posterior hacia el vértice. En la dominancia derecha, la más frecuente, nace de la arteria coronaria derecha e irriga la cara inferior y el tercio posterior del septo.'}
- ]}},
- abdomen:{name:'Abdomen superior',ctx:'abdomen',cam:{y:-.2,dist:12},build(){const bil=tubeOf([[-.5,.62,.25],[-.55,.35,.35],[-.62,0,.12],[-.78,-.3,-.08],[-.88,-.38,-.12]],.07,0x55b45a);
-  const cys=tubeOf([[-.9,.28,.55],[-.72,.36,.45],[-.56,.34,.36]],.05,0x2e8b57);
-  const ao=cyl(.17,3.8,0xd32f2f,[.45,-.3,-1.05]);const ivc=cyl(.2,3.8,0x2f5fb3,[-.1,-.3,-1.0]);
-  const colon=tubeOf([[-2.1,-1.8,.2],[-2.2,-.2,.2],[-1.9,.9,.4],[-.8,.2,.8],[.6,.3,.8],[1.6,1.1,.5],[2.15,1.55,.1],[2.2,.2,.1],[2.1,-1.8,.2]],.2,0xd8b48a,90);
-  const sb=new THREE.Mesh(new THREE.TorusKnotGeometry(.5,.18,120,14,3,5),new THREE.MeshStandardMaterial({color:0xe3a1a1,roughness:.5}));sb.position.set(0,-1.45,.4);sb.scale.set(1.25,.75,.7);
-  return [
-  {id:'liver',name:'Hígado',col:'#8b3a2b',obj:blob(1,0x8b3a2b,[-1.15,.65,.1],[1.65,.95,1.05]),d:'Mayor víscera sólida. Ocho segmentos de Couinaud. Trauma abdominal cerrado: laceración y hemorragia. Maniobra de Pringle (pinzar el pedículo) para controlar sangrado.'},
-  {id:'gb',name:'Vesícula biliar',col:'#2e8b57',obj:blob(.3,0x2e8b57,[-.95,.0,.6],[.8,1.6,.8]),d:'Se almacena y concentra la bilis. Arteria cística (rama de la hepática derecha). Colecistitis aguda se opera idealmente en las primeras 72 horas.'},
-  {id:'cys',name:'Conducto cístico',col:'#2e8b57',obj:cys,d:'Une la vesícula con el hepático común. Se clipa y secciona tras lograr la visión crítica de seguridad.'},
-  {id:'cbd',name:'Colédoco',col:'#55b45a',obj:bil,d:'Se forma por la unión del cístico con el hepático común y desemboca en la ampolla de Vater junto al conducto pancreático. Su lesión es la complicación grave más temida de la colecistectomía laparoscópica.'},
-  {id:'st',name:'Estómago',col:'#e0a6a0',obj:blob(.9,0xe0a6a0,[1.05,.8,.5],[1.25,.9,.75]),d:'Irrigación por arcos de curvatura menor (gástrica izquierda y derecha) y mayor (gastroepiploicas). Úlcera perforada típica en duodeno proximal o antro.'},
-  {id:'sp',name:'Bazo',col:'#7b4b94',obj:blob(.5,0x7b4b94,[2.05,.65,-.5],[.7,1.1,.5]),d:'Órgano más lesionado en trauma cerrado de abdomen. Esplenectomía exige vacunación contra encapsulados.'},
-  {id:'pan',name:'Páncreas',col:'#e8c04a',obj:(()=>{const m=blob(.3,0xe8c04a,[.3,-.05,-.45],[3.6,.8,.9]);m.rotation.z=.15;return m})(),d:'Retroperitoneal, anterior a la vena porta/mesentérica superior. La arteria esplénica corre en su borde superior. Pancreatitis y cirugía de Whipple.'},
-  {id:'duo',name:'Duodeno',col:'#d98c8c',obj:tubeOf([[.05,.4,.45],[-.55,.32,.3],[-.95,.05,.05],[-.98,-.45,-.1],[-.55,-.78,-.3],[.2,-.72,-.45],[.62,-.4,-.45]],.16,0xd98c8c,60),d:'Forma una "C" alrededor de la cabeza del páncreas. Su porción descendente (2.ª) recibe el colédoco y el conducto pancreático en la papila mayor (de Vater). Se moviliza con la maniobra de Kocher.'},
-  {id:'pv',name:'Vena porta',col:'#3f5fa8',obj:tubeOf([[.15,-.2,-.35],[-.15,.15,-.15],[-.45,.55,.05]],.1,0x3f5fa8),d:'Se forma detrás del cuello del páncreas por la unión de las venas mesentérica superior y esplénica. Asciende en el ligamento hepatoduodenal, por detrás del colédoco y de la arteria hepática.'},
-  {id:'cel',name:'Tronco celíaco y ramas',col:'#e2574c',obj:(()=>{const g=new THREE.Group();g.add(tubeOf([[.45,.4,-.95],[.45,.45,-.6]],.07,0xe2574c));g.add(tubeOf([[.45,.45,-.6],[0,.5,-.3],[-.45,.62,.12]],.05,0xe2574c));g.add(tubeOf([[.45,.45,-.6],[1.1,.4,-.55],[1.85,.55,-.5]],.05,0xe2574c));return g})(),d:'Nace de la aorta a nivel de T12 y se divide en gástrica izquierda, hepática común (hacia el hígado) y esplénica, que recorre el borde superior del páncreas hacia el bazo.'},
-  {id:'sma',name:'Arteria mesentérica superior',col:'#e2574c',obj:tubeOf([[.45,.1,-.95],[.42,-.25,-.25],[.3,-1.1,.15]],.06,0xe2574c),d:'Nace de la aorta a nivel de L1, pasa por detrás del cuello del páncreas y por delante de la porción horizontal del duodeno. Irriga el intestino medio.'},
-  {id:'kid',name:'Riñones',col:'#8a3324',obj:(()=>{const g=new THREE.Group();[[-.95,-.35,-1.15],[1.2,-.1,-1.15]].forEach(p=>{const m=blob(.5,0x8a3324,p,[.7,1.2,.6]);g.add(m)});return g})(),d:'Retroperitoneales. Pedículo renal: vena anterior, arteria, pelvis posterior. El riñón izquierdo es más alto que el derecho.'},
-  {id:'ao',name:'Aorta abdominal',col:'#d32f2f',obj:ao,d:'Desciende a la izquierda de la línea media; da celíaco (T12), mesentérica superior (L1), renales (L1–L2) y mesentérica inferior (L3). Bifurca en L4.'},
-  {id:'ivc',name:'Vena cava inferior',col:'#2f5fb3',obj:ivc,d:'A la derecha de la aorta. Lesión de IVC infrarrenal en trauma: sangrado profuso que requiere compresión directa.'},
-  {id:'colon',name:'Colon (marco)',col:'#d8b48a',obj:colon,d:'Marco colónico: ciego, ascendente, transverso, descendente y sigmoide. Colon derecho irrigado por la AMS; izquierdo por la AMI.'},
-  {id:'sb',name:'Intestino delgado',col:'#e3a1a1',obj:sb,d:'Yeyuno-íleon, de 3 a 7 m. Obstrucción por bridas en laparotomías previas. Resecciones mayores de 200 cm pueden causar síndrome de intestino corto.'}
- ]}}
-};
-let V=null,curKey=null;
-function initViewer(){
-  const chips=$('#modelChips');
-  chips.innerHTML=Object.entries(MODELS).map(([k,m])=>`<button class="chip" data-m="${k}" aria-pressed="false">${m.name}</button>`).join('')+`<button class="chip" id="bodyToggle" aria-pressed="true">Cuerpo y esqueleto</button><button class="chip" id="resetView">Restablecer vista</button>`;
-  chips.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(b)loadModel(b.dataset.m);if(e.target.id==='resetView'&&V)V.reset();
-    if(e.target.id==='bodyToggle'&&V){V.showBody=!V.showBody;e.target.setAttribute('aria-pressed',V.showBody);if(V.ctx)V.ctx.visible=V.showBody}});
-  try{
-    const host=$('#stage');
-    const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
-    renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));host.insertBefore(renderer.domElement,host.firstChild);
-    const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(40,1,.1,100);
-    scene.add(new THREE.HemisphereLight(0xffffff,0xc9b8a8,.65));scene.add(new THREE.AmbientLight(0xffffff,.25));
-    const l1=new THREE.DirectionalLight(0xffffff,.9);l1.position.set(3,5,6);scene.add(l1);
-    const l2=new THREE.DirectionalLight(0xffffff,.35);l2.position.set(-4,-2,-5);scene.add(l2);
-    const root=new THREE.Group();scene.add(root);
-    V={renderer,scene,camera,root,host,parts:[],sel:null,showBody:true,
-      reset(){const c=(MODELS[curKey]||{}).cam||{y:0,dist:9};root.rotation.set(.08,.15,0);this.dist=c.dist;camera.position.set(0,c.y,c.dist);camera.lookAt(0,c.y,0)}};
-    V.reset();
-    function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
-    new ResizeObserver(resize).observe(host);resize();
-    let down=null,moved=0;
-    const cv=renderer.domElement,pts=new Map();let pinch=0;
-    cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);down=[e.clientX,e.clientY];moved=0});
-    cv.addEventListener('pointermove',e=>{
-      if(!pts.has(e.pointerId))return;const o=pts.get(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);
-      if(pts.size===2){const [a,b]=[...pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch)zoom((pinch-d)*.03);pinch=d;moved=99;return}
-      const dx=e.clientX-o[0],dy=e.clientY-o[1];moved+=Math.abs(dx)+Math.abs(dy);
-      root.rotation.y+=dx*.01;root.rotation.x=Math.max(-1.4,Math.min(1.4,root.rotation.x+dy*.01))});
-    const up=e=>{pts.delete(e.pointerId);pinch=0;if(e.type==='pointerup'&&moved<5&&down)pick(e)};
-    cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
-    function zoom(d){V.dist=Math.max(4.5,Math.min(22,V.dist+d));camera.position.z=V.dist}
-    cv.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY*.01)},{passive:false});
-    const ray=new THREE.Raycaster();
-    function pick(e){const r=cv.getBoundingClientRect();
-      ray.setFromCamera(new THREE.Vector2(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1),camera);
-      const vis=V.parts.filter(p=>p.obj.visible);const hit=ray.intersectObjects(vis.map(p=>p.obj),true)[0];
-      if(hit){const p=vis.find(p=>p.obj===hit.object||p.obj.children.includes(hit.object)||hit.object.parent===p.obj);if(p)select(p.id)}else select(null)}
-    (function loop(){requestAnimationFrame(loop);if(host.offsetParent!==null)renderer.render(scene,camera)})();
-    loadModel('corazon');
-  }catch(err){$('#stage').insertAdjacentHTML('afterbegin','<div class="fail">Este navegador no puede mostrar gráficos 3D (WebGL). Use otro navegador para ver los modelos.</div>')}
-}
-function meshesOf(o){const a=[];o.traverse(m=>{if(m.isMesh)a.push(m)});return a}
-function loadModel(k){
-  if(!V)return;curKey=k;
-  document.querySelectorAll('#modelChips [data-m]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===k));
-  while(V.root.children.length)V.root.remove(V.root.children[0]);
-  V.parts=MODELS[k].build();V.parts.forEach(p=>{V.root.add(p.obj);meshesOf(p.obj).forEach(m=>{m.material.transparent=true})});
-  V.ctx=bodyContext(MODELS[k].ctx);V.ctx.visible=V.showBody;V.root.add(V.ctx);
-  const ib=$('#insetBox');if(ib){const t=MODELS[k].ctx==='torax';ib.setAttribute('y',t?21:44);ib.setAttribute('height',t?25:28)}
-  V.root.position.set(0,0,0);V.reset();
-  $('#parts').innerHTML=V.parts.map(p=>`<div class="part"><input type="checkbox" checked data-v="${p.id}" aria-label="Mostrar ${p.name}"><button data-s="${p.id}" aria-pressed="false"><span class="sw" style="background:${p.col}"></span><span>${p.name}</span></button></div>`).join('');
-  select(null);
-  const s=$('#m3dSearch');if(s&&s.value)s.dispatchEvent(new Event('input'));
-}
-function select(id){
-  if(!V)return;V.sel=id;
-  V.parts.forEach(p=>meshesOf(p.obj).forEach(m=>{m.material.opacity=(!id||p.id===id)?1:.22;m.material.emissive.setHex(p.id===id?0x333333:0)}));
-  document.querySelectorAll('#parts [data-s]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===id));
-  const p=V.parts.find(p=>p.id===id);
-  const PREF={
-   'corazon:lv':'moore,netter@201,netter@209','corazon:rv':'moore,sabiston,netter@201,netter@208','corazon:la':'moore,netter@209','corazon:ra':'moore,sabiston,netter@208',
-   'corazon:ao':'moore,sabiston,netter@201','corazon:pa':'moore,netter@201','corazon:svc':'moore,sabiston,netter@201','corazon:ivc':'moore,netter@202',
-   'corazon:lad':'moore,sabiston,netter@204','corazon:lcx':'moore,netter@204','corazon:rca':'moore,netter@204,netter@205','corazon:pda':'moore,netter@204,netter@205',
-   'abdomen:liver':'moore,sabiston,netter@269,netter@270','abdomen:gb':'moore,sabiston,netter@276','abdomen:cys':'strasberg,moore,netter@276,netter@277','abdomen:cbd':'strasberg,moore,netter@276,netter@278',
-   'abdomen:st':'moore,netter@258,netter@282','abdomen:sp':'sabiston,moore,netter@281','abdomen:pan':'moore,sabiston,netter@279','abdomen:duo':'moore,sabiston,netter@261,netter@279',
-   'abdomen:pv':'moore,netter@279,netter@290','abdomen:cel':'moore,netter@282','abdomen:sma':'moore,netter@279,netter@286','abdomen:kid':'moore,netter@311',
-   'abdomen:ao':'moore,sabiston,netter@247','abdomen:ivc':'moore,atls,netter@248','abdomen:colon':'moore,netter@287','abdomen:sb':'moore,netter@253'};
-  $('#pinfo').innerHTML=p?withRefs(`<div class="calc-head"><b>${p.name}</b>${saveBtn(`m3d:${curKey}:${p.id}`,`${p.name} · ${MODELS[curKey].name}`)}</div><p>${p.d}{{${PREF[curKey+':'+p.id]||'moore'}}}</p>`):'Seleccione una estructura de la lista o tóquela en el modelo.';
-}
-$('#parts').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b)select(V.sel===b.dataset.s?null:b.dataset.s)});
-$('#parts').addEventListener('change',e=>{const c=e.target.dataset.v;if(!c)return;const p=V.parts.find(p=>p.id===c);p.obj.visible=e.target.checked});
 
 document.querySelectorAll('[data-refs]').forEach(e=>{e.innerHTML=withRefs(e.innerHTML)});
 
@@ -1174,26 +984,12 @@ $('#fisSearch').addEventListener('input',e=>{
   sec.querySelectorAll(':scope > h3').forEach(h=>{const nx=h.nextElementSibling;h.hidden=!!(nx&&nx.hidden)});
   $('#fisEmpty').hidden=!q||n>0;
 });
-/* Modelos 3D: filtra la lista de estructuras y avisa si la búsqueda está en el otro modelo */
-const MODEL_TXT={};
-const modelTxt=k=>MODEL_TXT[k]||(MODEL_TXT[k]=MODELS[k].build().map(p=>({id:p.id,name:p.name,d:p.d})));
-$('#m3dSearch').addEventListener('input',e=>{
-  const q=e.target.value.trim(),hint=$('#m3dHint');if(!V){hint.hidden=true;return}
-  let first=null,n=0;
-  document.querySelectorAll('#parts .part').forEach(row=>{const id=row.querySelector('[data-s]').dataset.s,p=V.parts.find(p=>p.id===id);
-    const ok=matchQ(p.name+' '+p.d,q);row.hidden=!ok;if(ok){n++;first=first||id}});
-  const others=q?Object.keys(MODELS).filter(k=>k!==curKey&&modelTxt(k).some(p=>matchQ(p.name+' '+p.d,q))):[];
-  if(q&&n===1)select(first);
-  hint.hidden=!q||(n>0&&!others.length);
-  hint.innerHTML=(n?'':'No hay estructuras que coincidan en este modelo. ')+(others.length?'También aparece en: '+others.map(k=>`<button type="button" class="chip" data-goto-model="${k}">${MODELS[k].name}</button>`).join(' '):'');
-});
-$('#m3dHint').addEventListener('click',e=>{const b=e.target.closest('[data-goto-model]');if(b)loadModel(b.dataset.gotoModel)});
 
 /* ---------- guardar en listas ---------- */
 document.querySelectorAll('#s-fisiologia h3').forEach(h=>{const t=h.textContent.trim(),k='fis:'+slug(t);
   (h.closest('.card')||h).dataset.save=k;h.classList.add('with-save');h.insertAdjacentHTML('beforeend',saveBtn(k,t))});
-const TYPE_LABEL={anat:'Anatomía',fis:'Fisiología',farm:'Farmacología',tec:'Técnica',calc:'Calculadora',m3d:'Modelo 3D'};
-const SEC_OF={anat:'anatomia',fis:'fisiologia',farm:'farmacologia',tec:'tecnicas',calc:'calculadoras',m3d:'modelos3d'};
+const TYPE_LABEL={anat:'Anatomía',fis:'Fisiología',farm:'Farmacología',tec:'Técnica',calc:'Calculadora'};
+const SEC_OF={anat:'anatomia',fis:'fisiologia',farm:'farmacologia',tec:'tecnicas',calc:'calculadoras'};
 let dlgItem=null;
 const dlg=$('#saveDlg');
 function refreshSaveBtns(){document.querySelectorAll('.save-btn').forEach(b=>b.setAttribute('aria-pressed',isSaved(b.dataset.saveKey)))}
@@ -1223,7 +1019,7 @@ function renderLists(){
   <div class="list-rename toolbar" hidden><input value="${escA(l.name)}" aria-label="Nuevo nombre de la lista" style="flex:1;min-width:0"><button class="btn sm" type="button" data-act="rename-ok">Guardar nombre</button></div>
   <div class="list-confirm" hidden><span>¿Eliminar la lista «${esc(l.name)}» con ${l.items.length} ${l.items.length===1?'elemento':'elementos'}?</span><button class="btn sm danger" type="button" data-act="del-ok">Sí, eliminar</button><button class="btn ghost sm" type="button" data-act="del-no">Cancelar</button></div>
   ${l.items.length?`<ul class="list-items">${l.items.map(it=>{const ty=it.k.split(':')[0];return `<li><span class="pill">${TYPE_LABEL[ty]||''}</span><button class="link-btn" type="button" data-open="${escA(it.k)}">${esc(it.t)}</button><button class="icon-x" type="button" data-act="rm" data-k="${escA(it.k)}" aria-label="Quitar ${escA(it.t)} de la lista">×</button></li>`}).join('')}</ul>`
-   :'<p class="lead" style="font-size:.9rem;margin:.6rem 0 0">Lista vacía. Toque el marcador junto a un tema, técnica, fármaco, calculadora o estructura 3D para agregarlo.</p>'}
+   :'<p class="lead" style="font-size:.9rem;margin:.6rem 0 0">Lista vacía. Toque el marcador junto a un tema, técnica, fármaco o calculadora para agregarlo.</p>'}
 </div>`).join(''):'<p class="lead">No tiene listas. Cree una arriba.</p>';
 }
 $('#newListBtn').addEventListener('click',()=>{if(createList($('#newListName').value)){$('#newListName').value='';renderLists()}else $('#newListName').focus()});
@@ -1243,11 +1039,10 @@ $('#listsWrap').addEventListener('click',e=>{
 function openItem(k){
   const [ty,a,b]=k.split(':'),sec=SEC_OF[ty];if(!sec)return;
   history.pushState(null,'','#'+sec);show(sec);
-  ['anatSearch','techSearch','fisSearch','calcSearch','m3dSearch','drugSearch'].forEach(id=>{const i=$('#'+id);if(i&&i.value){i.value='';i.dispatchEvent(new Event('input'))}});
+  ['anatSearch','techSearch','fisSearch','calcSearch','drugSearch'].forEach(id=>{const i=$('#'+id);if(i&&i.value){i.value='';i.dispatchEvent(new Event('input'))}});
   if(ty==='farm'&&drugCat!=='Todos'){drugCat='Todos';$('#drugChips').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.cat==='Todos'));renderDrugs()}
   let el;
-  if(ty==='m3d'){if(V){loadModel(a);select(b)}el=$('#stage')}
-  else el=document.querySelector(`[data-save="${CSS.escape(k)}"]`);
+  el=document.querySelector(`[data-save="${CSS.escape(k)}"]`);
   if(!el)return;
   if(el.tagName==='DETAILS')el.open=true;
   setTimeout(()=>{el.scrollIntoView({block:'start'});window.scrollBy(0,-72);el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')},30);
@@ -1265,7 +1060,7 @@ function decodeLists(text){
     const bin=atob(s+'='.repeat((4-s.length%4)%4));json=new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0)))}
   const d=JSON.parse(json);if(!d||!Array.isArray(d.lists))throw new Error('formato');
   return d.lists.filter(l=>l&&typeof l.name==='string').map(l=>({name:l.name.trim().slice(0,80)||'Lista importada',
-    items:(Array.isArray(l.items)?l.items:[]).filter(it=>it&&typeof it.t==='string'&&/^(anat|fis|farm|tec|calc|m3d):[a-z0-9:-]{1,120}$/.test(it.k)).map(it=>({k:it.k,t:it.t.slice(0,200)}))}));
+    items:(Array.isArray(l.items)?l.items:[]).filter(it=>it&&typeof it.t==='string'&&/^(anat|fis|farm|tec|calc):[a-z0-9:-]{1,120}$/.test(it.k)).map(it=>({k:it.k,t:it.t.slice(0,200)}))}));
 }
 function applyImport(lists,mode){let nl=0,ni=0;
   if(mode==='replace')LISTS.lists=[];
