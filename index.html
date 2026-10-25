@@ -82,7 +82,7 @@ input[type=range]{padding:0;accent-color:var(--accent)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 @media(max-width:760px){.two{grid-template-columns:1fr}}
 details{border:1px solid var(--line);border-radius:8px;background:var(--surface);margin:.6rem 0}
-details>summary{cursor:pointer;padding:.8rem 1.1rem;font:600 1.05rem var(--serif);list-style:none;display:flex;justify-content:space-between;gap:1rem}
+details>summary{cursor:pointer;padding:.8rem 1.1rem;font:600 1.05rem var(--serif);list-style:none;display:flex;justify-content:space-between;align-items:center;gap:1rem}
 details>summary::after{content:"+";color:var(--accent);font-family:var(--mono)}
 details[open]>summary::after{content:"−"}
 details>.body{padding:0 1.1rem 1rem}
@@ -151,6 +151,10 @@ a.home-card:hover{border-color:var(--accent)} a.home-card.red:hover{border-color
   .top-in{justify-content:center}
   body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
 }
+/* textos de los esquemas inguinales */
+.ig-t{fill:var(--ink);font:500 13px var(--sans)} .ig-s{fill:var(--muted);font:12px var(--sans)}
+.ig-r{fill:var(--alert);font:600 13px var(--sans)} .ig-b{fill:var(--accent);font:600 13px var(--sans)}
+.ig-t,.ig-s,.ig-r,.ig-b{paint-order:stroke;stroke:var(--soft);stroke-width:4px;stroke-linejoin:round}
 /* app instalable */
 .install{padding:.4rem .85rem;font-size:.82rem;white-space:nowrap;flex:none}
 .install-tip{display:flex;gap:.8rem;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--accent-soft);color:var(--ink);border-radius:8px;padding:.7rem 1rem;margin-bottom:1rem;font-size:.9rem}
@@ -349,7 +353,7 @@ function cite(html){
     const n=ks.split(',').map(s=>{const [k,p]=s.split('@');if(!REFS[k])return 0;
       let i=order.indexOf(k);if(i<0){order.push(k);i=order.length-1}
       if(p)(plates[k]=plates[k]||new Set()).add(+p);return i+1}).filter(Boolean);
-    const u=[...new Set(n)];
+    const u=[...new Set(n)].sort((a,b)=>a-b);
     return u.length?`<sup class="cite">[${u.join(',')}]</sup>`:'';
   });
   return [out,refList(order,plates)];
@@ -427,6 +431,55 @@ const SVG_CALOT=`<svg viewBox="0 0 330 200" role="img" aria-label="Triángulo he
 <path d="M240 100 C200 80 150 70 100 95" style="stroke:var(--alert)" stroke-width="4" fill="none"/>
 <path d="M200 40 L115 85 L200 130" style="fill:var(--alert);fill-opacity:.06;stroke:var(--ink)" stroke-dasharray="5 4" stroke-width="1.5"/>
 <text x="212" y="160" class="svgt">Colédoco</text><text x="212" y="62" class="svgt">Hepático común</text><text x="122" y="118" class="svgt" transform="rotate(25 122 118)">Cístico</text><text x="215" y="98" class="svgt" style="fill:var(--alert)">Arteria cística</text><text x="22" y="190" class="svgt">Vesícula</text></svg>`;
+/* Esquemas propios de la región inguinal derecha (verificados con Netter, láminas 242–245) */
+const SVG_INGUINAL_POST=`<svg viewBox="0 0 560 470" style="max-height:none" role="img" aria-label="Región inguinal derecha vista desde dentro del abdomen: triángulo de Hesselbach, anillo profundo, anillo femoral y triángulos del desastre y del dolor">
+<defs><pattern id="igHatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="9" height="9" style="fill:var(--alert-soft)"/><line x1="0" y1="0" x2="0" y2="9" style="stroke:var(--alert)" stroke-width="2" opacity=".35"/></pattern></defs>
+<text x="20" y="22" class="ig-s">Lado derecho, visto desde dentro del abdomen (como en laparoscopia)</text>
+<path d="M320,236 Q230,170 115,70 L115,318 Z" style="fill:var(--accent-soft);stroke:var(--accent)" stroke-width="1.5" stroke-dasharray="6 4"/>
+<path d="M362,210 C330,240 290,300 250,430 L438,430 C418,330 396,262 370,212 Z" style="fill:var(--alert-soft)"/>
+<path d="M372,214 L530,150 L548,430 L446,430 C424,330 400,264 372,214 Z" style="fill:url(#igHatch)"/>
+<rect x="20" y="40" width="95" height="285" rx="6" style="fill:var(--surface);stroke:var(--muted)" stroke-width="1.5"/>
+<text x="67" y="182" class="ig-s" text-anchor="middle" transform="rotate(-90 67 182)">Músculo recto del abdomen</text>
+<line x1="125" y1="345" x2="300" y2="295" style="stroke:var(--muted)" stroke-width="5" stroke-linecap="round" opacity=".7"/>
+<line x1="530" y1="150" x2="115" y2="320" style="stroke:var(--ink)" stroke-width="4" stroke-linecap="round"/>
+<path d="M372,430 L322,240" style="stroke:var(--alert)" stroke-width="9" stroke-linecap="round" fill="none"/>
+<path d="M345,430 L298,247" style="stroke:var(--accent)" stroke-width="11" stroke-linecap="round" fill="none" opacity=".85"/>
+<path d="M320,236 Q230,170 115,70" style="stroke:var(--alert)" stroke-width="4" fill="none"/>
+<path d="M115,70 L92,30" style="stroke:var(--alert)" stroke-width="3" fill="none" stroke-dasharray="5 4"/>
+<path d="M376,208 C398,262 422,332 442,430" style="stroke:var(--alert)" stroke-width="3" fill="none"/>
+<path d="M384,206 C406,262 430,332 450,430" style="stroke:var(--accent)" stroke-width="3" fill="none"/>
+<path d="M356,206 C330,236 282,292 215,430" style="stroke:var(--ink)" stroke-width="4" fill="none"/>
+<path d="M505,430 L496,200" style="stroke:var(--ink)" stroke-width="1.5" stroke-dasharray="2 4" fill="none"/>
+<path d="M478,430 L462,226" style="stroke:var(--ink)" stroke-width="1.5" stroke-dasharray="2 4" fill="none"/>
+<ellipse cx="365" cy="198" rx="21" ry="13" style="fill:var(--surface);stroke:var(--ink)" stroke-width="2"/>
+<ellipse cx="262" cy="276" rx="16" ry="10" style="fill:var(--surface);stroke:var(--ink)" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="140" y="196" class="ig-b">Triángulo de</text><text x="140" y="213" class="ig-b">Hesselbach</text><text x="140" y="230" class="ig-s">hernia directa</text>
+<text x="230" y="98" class="ig-t">Vasos epigástricos</text><text x="230" y="114" class="ig-t">inferiores</text><line x1="252" y1="120" x2="238" y2="172" style="stroke:var(--muted)"/>
+<text x="330" y="128" class="ig-t">Anillo inguinal profundo</text><text x="330" y="144" class="ig-s">hernia indirecta</text><line x1="362" y1="150" x2="364" y2="184" style="stroke:var(--muted)"/>
+<text x="136" y="300" class="ig-t" transform="rotate(-22.3 136 300)">Ligamento inguinal</text><text x="410" y="190" class="ig-s" transform="rotate(-22.3 410 190)">Tracto iliopúbico</text>
+<text x="140" y="372" class="ig-s" transform="rotate(-16 140 372)">Lig. de Cooper</text>
+<text x="20" y="350" class="ig-t">Anillo femoral</text><text x="20" y="366" class="ig-s">hernia femoral</text><line x1="118" y1="346" x2="248" y2="283" style="stroke:var(--muted)"/>
+<text x="344" y="392" class="ig-r" text-anchor="middle">Triángulo del desastre</text><text x="344" y="408" class="ig-s" text-anchor="middle">a. y v. ilíacas externas</text>
+<text x="500" y="300" class="ig-r" text-anchor="middle">Triángulo</text><text x="500" y="316" class="ig-r" text-anchor="middle">del dolor</text><text x="500" y="332" class="ig-s" text-anchor="middle">nervios</text>
+<text x="215" y="452" class="ig-s" text-anchor="middle">Conducto deferente</text>
+<text x="452" y="452" class="ig-s" text-anchor="middle">Vasos testiculares</text>
+<text x="20" y="466" class="ig-s">◂ medial</text><text x="545" y="466" class="ig-s" text-anchor="end">lateral ▸</text>
+</svg>`;
+const SVG_INGUINAL_CANAL=`<svg viewBox="0 0 520 290" style="max-height:none" role="img" aria-label="Paredes del conducto inguinal en corte sagital esquemático">
+<text x="260" y="22" class="ig-s" text-anchor="middle">Corte sagital esquemático (anterior a la izquierda)</text>
+<text x="260" y="56" class="ig-t" text-anchor="middle"><tspan class="ig-b">Techo:</tspan> fibras arqueadas del oblicuo interno y transverso</text>
+<rect x="186" y="74" width="148" height="16" rx="3" style="fill:var(--accent)"/>
+<rect x="186" y="190" width="148" height="16" rx="3" style="fill:var(--ink)" opacity=".75"/>
+<rect x="186" y="74" width="16" height="132" rx="3" style="fill:var(--alert)"/>
+<rect x="318" y="74" width="16" height="132" rx="3" style="fill:var(--accent)" opacity=".55"/>
+<circle cx="260" cy="140" r="36" style="fill:var(--alert-soft);stroke:var(--alert)" stroke-width="1.5"/>
+<text x="260" y="137" class="ig-s" text-anchor="middle">Cordón</text><text x="260" y="152" class="ig-s" text-anchor="middle">espermático</text>
+<text x="176" y="122" class="ig-r" text-anchor="end">Pared anterior:</text><text x="176" y="139" class="ig-t" text-anchor="end">aponeurosis del</text><text x="176" y="156" class="ig-t" text-anchor="end">oblicuo externo</text><text x="176" y="173" class="ig-s" text-anchor="end">(+ oblicuo interno lateral)</text>
+<text x="344" y="122" class="ig-b">Pared posterior:</text><text x="344" y="139" class="ig-t">fascia transversal</text><text x="344" y="156" class="ig-s">(+ tendón conjunto</text><text x="344" y="173" class="ig-s">medialmente)</text>
+<text x="260" y="232" class="ig-t" text-anchor="middle"><tspan font-weight="600">Piso:</tspan> ligamento inguinal (y lacunar medialmente)</text>
+<text x="260" y="262" class="ig-s" text-anchor="middle">Contenido: cordón espermático o ligamento redondo,</text>
+<text x="260" y="278" class="ig-s" text-anchor="middle">nervio ilioinguinal y rama genital del genitofemoral</text>
+</svg>`;
 const ANAT=[
 {t:'Triángulo hepatocístico (de Calot) y vía biliar',tag:'Colecistectomía',svg:SVG_CALOT,cap:'Esquema: el triángulo se limita por el conducto cístico, el hepático común y el borde inferior del hígado.{{strasberg,moore,netter@276}}',html:`
 <ul class="tight"><li><b>Contenido:</b> arteria cística (rama de la hepática derecha), ganglio de Lund, tejido linfograso.{{moore,sabiston,netter@276}}</li>
@@ -434,7 +487,9 @@ const ANAT=[
 <li><b>Referencias de seguridad:</b> surco de Rouvière (la disección se mantiene por encima de él){{sabiston}} y visión crítica de seguridad.{{strasberg}}</li>
 <li><b>Lesión típica:</b> confundir el colédoco con el cístico (clasificación de Strasberg para lesiones de la vía biliar).{{strasberg}}</li></ul>
 <div class="risk"><b>Visión crítica de seguridad:</b> triángulo despejado de grasa y fibrosis, el tercio inferior de la vesícula separado del lecho hepático, y exactamente dos estructuras que entran en la vesícula.{{strasberg}} Si no se logra, convertir o hacer colecistectomía subtotal.{{sabiston}}</div>`},
-{t:'Canal inguinal y triángulos de riesgo',tag:'Hernia inguinal',html:`
+{t:'Canal inguinal y triángulos de riesgo',tag:'Hernia inguinal',figs:[
+ {svg:SVG_INGUINAL_POST,cap:'Esquema propio de la región inguinal derecha vista desde dentro. El triángulo de Hesselbach queda entre los vasos epigástricos inferiores, el borde lateral del recto y el ligamento inguinal; el anillo profundo es lateral a esos vasos.{{netter@243,netter@244,moore}} Triángulos del desastre y del dolor según la anatomía laparoscópica.{{sabiston,herniasurge}}'},
+ {svg:SVG_INGUINAL_CANAL,cap:'Esquema propio de las paredes y el contenido del conducto inguinal.{{netter@242,netter@245,moore}}'}],html:`
 <div class="meta"><div><span>Longitud</span>4–6 cm, oblicuo, sobre el ligamento inguinal</div><div><span>Contenido</span>Cordón espermático o ligamento redondo, nervio ilioinguinal, rama genital del genitofemoral{{moore,netter@245}}</div></div>
 <ul class="tight"><li><b>Pared anterior:</b> aponeurosis del oblicuo externo (más oblicuo interno lateralmente). <b>Posterior:</b> fascia transversalis y tendón conjunto. <b>Techo:</b> oblicuo interno y transverso. <b>Piso:</b> ligamento inguinal y lacunar.{{moore,sabiston,netter@243}}</li>
 <li><b>Hernia indirecta:</b> sale por el anillo profundo, <u>lateral</u> a los vasos epigástricos inferiores. <b>Directa:</b> a través del triángulo de Hesselbach, <u>medial</u> a esos vasos (límites: vasos epigástricos, borde lateral del recto, ligamento inguinal).{{moore,herniasurge,netter@243}}</li>
@@ -467,7 +522,7 @@ const ANAT=[
 <li><b>McBurney:</b> incisión oblicua que divide las fibras musculares (sin cortarlas). <b>Kocher</b> subcostal derecha para vesícula.{{sabiston}}</li>
 <li><b>Puertos laparoscópicos:</b> los vasos epigástricos inferiores se visualizan por transiluminación o laparoscopía antes de colocar trocares laterales.{{sabiston,netter@238}}</li></ul>`}
 ];
-$('#anatList').innerHTML=ANAT.map((a,i)=>`<details ${i===0?'open':''}><summary><span>${a.t}</span><span class="pill">${a.tag}</span></summary><div class="body">${withRefs(a.html+(a.svg?`<figure>${a.svg}<figcaption>${a.cap}</figcaption></figure>`:''))}</div></details>`).join('');
+$('#anatList').innerHTML=ANAT.map((a,i)=>`<details ${i===0?'open':''}><summary><span>${a.t}</span><span class="pill">${a.tag}</span></summary><div class="body">${withRefs(a.html+(a.figs||(a.svg?[{svg:a.svg,cap:a.cap}]:[])).map(f=>`<figure>${f.svg}<figcaption>${f.cap}</figcaption></figure>`).join(''))}</div></details>`).join('');
 
 /* ---------- fisiología ---------- */
 const SHOCK=[
